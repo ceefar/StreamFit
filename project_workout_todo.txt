@@ -1,0 +1,25 @@
+SO
+legit just do this through database and form
+so user enters that form info
+timer starts
+timer ends
+page reruns
+the information fills any persisting fields from the database
+and provides the logic for things like sets etc
+
+
+RN
+if set4 wipe everything and make dem continue - or sumnt similar maybe its just like a stats bit just the metric whatever its so sick omg
+exercise 2
+
+
+DB
+create id - even if simple but just so is done duh (with name anonymity?)
+verification for if you exist or not and simple db login!!!!!! - legit already have the code bosh af
+show previous set in new dropdown by current info if vlaid
+do simple running metric
+
+
+YOU GOTTA THINK MORE MVP!
+e.g.
+- you dont need set timer and dynamic timer, just have it be dynamic only at the start!

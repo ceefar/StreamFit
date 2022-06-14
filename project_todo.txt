@@ -1,0 +1,22 @@
+# FOUNDATIONAL
+adding this stuff as obvs is foundational but also is a good time to get more comfy with base level things like...
+    - logging
+    - unit tests
+
+# BASICS
+
+
+# APP NOTES
+- isn't this massive better in intro bit as book ting?
+
+
+# QUICK NOTES
+- obvs the basic logger with timer
+- obvs basic stats
+    - running weights and various
+    - end stats
+- more advanced is adding in when consistent enough at ceiling prompt to increase (and inverse for decrease)\
+- changing equipment, only valid, with recommendation
+    - then improve that to be based off user level
+- onboarding to set things like user level etc (could do equip then but they can skip too, being sure to reprompt them at a fitting time)
+- selecting equipment during a long break for ease in future 
