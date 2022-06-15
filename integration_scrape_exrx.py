@@ -81,14 +81,50 @@ def get_info_from_mg_parent(a_parent):
         #print("Choose Auxillary Abs")
         return("Choose Auxillary Abs")
 
-
-
         # OPTIONAL AND THIS IS DONE BAR FORMATTING FOR LINK
         # THEN JUST GET IMAGES OOO
 
-        
 
+def get_all_exercises_from_mg(doc):
+    # ACTUALLY NEED THIS TO BE DONE PROPERLY WITH THE ASSOCIATIONS, FIGURE OUT HOW TO DO IT
 
+    for a in doc.find_all('a', href=True):
+        name = (f"{a.text}")
+        link = (a['href']) 
+
+    end_index = str(doc).find("Exercise Lists")
+    if end_index == -1:
+        end_index = str(doc).find("Exercise List")
+    doc2 = str(doc)[:end_index]
+    doc2 = soup(doc2, "html.parser")
+
+    for a in doc2.find_all('a', href=True):
+        name = (f"{a.text}")
+        link = (a['href'])
+
+    start_index = str(doc2).find("mainShell")
+    doc3 = str(doc2)[start_index:]
+    doc3 = soup(doc3, "html.parser")
+
+    ex_plus_links_list = []
+
+    for a in doc3.find_all('a', href=True):
+        name = (f"{a.text}")
+        link = (a['href']) #f"{a.get('href')}"
+        ex_plus_links_list.append((name,link))
+
+        #print(f"{name = }")
+        #print(f"{link = }")
+        #print("##")
+
+    doc4 = str(doc)[start_index:end_index]
+    doc4 = soup(doc4, "html.parser")
+
+    # can return doc4 too if needed btw
+
+    [print(tup) for tup in ex_plus_links_list]
+
+    return(ex_plus_links_list)
     
 
     
@@ -162,7 +198,10 @@ def program():
 
 # driver... vrmmmm
 if __name__=='__main__':
-    program() 
+    #program() 
+    result = requests.get("https://exrx.net/Lists/ExList/ArmWt#Triceps") #("https://exrx.net/Lists/ExList/ChestWt#General")
+    doc = soup(result.text, "html.parser")
+    get_all_exercises_from_mg(doc)
 
 
 # THEN ON TO STREAMLIT AND IMPLEMENT IMAGES AND SIMPLE TRACKING OOOOO
@@ -172,12 +211,9 @@ if __name__=='__main__':
     # - have timer initial setting be dynamic based on the info from the exercise info 
 
 
-
-
-
-
 # FOR FULL LINKS!
 # https://stackoverflow.com/questions/64079965/print-only-lines-in-html-with-a-href-within-a-divider-html-using-the-beaut
+
 
 """
 li = doc.find('li', {'class': 'col-sm-6'})

@@ -1,2 +1,7 @@
 temp_replacer.py
 mayneedfuncs.py
+SIC_ETL_REFERENCE/DashboardUSEME.py
+.gitignore
+SIC_ETL_REFERENCE/siic_etl_streamlitUSEME.py
+SIC_ETL_REFERENCE/siic_etl.py
+SIC_ETL_REFERENCE/siic_ceefar.py

@@ -51,12 +51,33 @@ def get_real_world_weight_comparison(weight):
     # allow to choose a diff other random one
     # and share too
 
-    # in lbs, must convert
-    moderate=[("Car Tire",14),("Karaoke Machine",20),("2 Year Old Toddler",25),("A Human Leg",40)]
-    # CONVERT ALL EXCEPT TIRE TO KG
-
+    # URM, PROBABLY JUST MAKE EM DICTIONARIES THEN DUH!
+    light=[(10,"Chocolate Bar")]
+    moderate=[(14,"Car Tire"),(20,"Karaoke Machine"),(25,"2 Year Old Toddler"),(40,"A Human Leg"),(80,"Head Of Giraffe"),(99,"A Flock Of Geese"),(181.43,"Whale Heart"),(250,"Jesus Christ")]
+    # CONVERT ALL EXCEPT TIRE TO KG - actually doesnt matter rn tho
     heavy=[("Whale Heart",181.43)] # name, weight in kg, weight in lbs? (400 for whale btw)
-    return(("Object",1000,"1.5x")) # objects weight so ig could compare how close to that you are in a metric too? (can also do the x times too, mays well return in the tuple tbf)
+
+    # so you basically just do this twice, once to find which bucket it is closest too by giving the buckets a different var thats their range (max ig)
+    # then once you have the bucket you do the below bosh
+
+    check_list = []
+    [check_list.append(weight[0]) for weight in moderate]
+    min_numb_result = (min(check_list, key=lambda x:abs(x-weight)))
+
+    #print(f"{min_numb_result = }")
+
+    find_result_dict = dict(moderate)
+    find_result = find_result_dict[min_numb_result]
+
+    #print(f"{find_result = }")
+
+    multiplier:float = min_numb_result/weight
+
+    #print(f"{multiplier = }")
+
+    return((find_result,min_numb_result,multiplier)) # objects weight so ig could compare how close to that you are in a metric too? (can also do the x times too, mays well return in the tuple tbf)
+    #return(("Object",1000,"1.5x"))
+
 
     # http://www.weightandthings.com/screens.php?p=67&u=kg
     # https://www.sparkpeople.com/blog/blog.asp?post=what_things_weigh_measure_your_progress_with_realworld_items
@@ -64,5 +85,5 @@ def get_real_world_weight_comparison(weight):
     
 
 
-    
+get_real_world_weight_comparison(65)
 

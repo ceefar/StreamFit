@@ -67,16 +67,16 @@ def update_db(args):
             name_of_mgnumb = arg
         if i == 4:
             the_current_set = arg
-            st.session_state["currentset"] += 1
+            st.session_state["2currentset"] += 1
         if i == 5:
             completed_reps = arg
         if i == 6:
-            if st.session_state["currentset"] == 2:
-                st.session_state["exset1"] = arg
-            if st.session_state["currentset"] == 3:
-                st.session_state["exset2"] = arg
-            if st.session_state["currentset"] == 4:
-                st.session_state["exset3"] = arg
+            if st.session_state["2currentset"] == 2:
+                st.session_state["ex2set1"] = arg
+            if st.session_state["2currentset"] == 3:
+                st.session_state["ex2set2"] = arg
+            if st.session_state["2currentset"] == 4:
+                st.session_state["ex2set3"] = arg
             used_weight = arg
         if i == 7:
             the_total_weight = arg
@@ -92,7 +92,7 @@ def grab_previous_set_data(userName, sessionName, muscleNumb) -> tuple:
     """ pls write me ceefar """
     # obvs this will be equip so dw too much about weird way of doing this,
     # for ex 2 just do same since we know which exercise number it is
-    needed_mg_name_format = f"1.{muscleNumb}" 
+    needed_mg_name_format = f"2.{muscleNumb}" 
     previous_set = fitdb.find_previous_sets_for_muscle(userName, sessionName, needed_mg_name_format)
     return(previous_set)
 
@@ -131,39 +131,39 @@ def run():
 
     # ---- session state variable declarations ----
 
-    if "exset1" not in st.session_state: # CURRENTLY STORES WEIGHT AS A SESSIONSTATE VARIABLE BTW
-        st.session_state["exset1"] = False
+    if "ex2set1" not in st.session_state: # CURRENTLY STORES WEIGHT AS A SESSIONSTATE VARIABLE BTW
+        st.session_state["ex2set1"] = False
 
-    if "exset1reps" not in st.session_state:
-        st.session_state["exset1reps"] = 0
+    if "ex2set1reps" not in st.session_state:
+        st.session_state["ex2set1reps"] = 0
 
-    if "exset2" not in st.session_state: # CURRENTLY STORES WEIGHT AS A SESSIONSTATE VARIABLE BTW
-        st.session_state["exset2"] = False
+    if "ex2set2" not in st.session_state: # CURRENTLY STORES WEIGHT AS A SESSIONSTATE VARIABLE BTW
+        st.session_state["ex2set2"] = False
 
-    if "exset2reps" not in st.session_state:
-        st.session_state["exset2reps"] = 0
+    if "ex2set2reps" not in st.session_state:
+        st.session_state["ex2set2reps"] = 0
 
-    if "exset3" not in st.session_state: # CURRENTLY STORES WEIGHT AS A SESSIONSTATE VARIABLE BTW
-        st.session_state["exset3"] = False
+    if "ex2set3" not in st.session_state: # CURRENTLY STORES WEIGHT AS A SESSIONSTATE VARIABLE BTW
+        st.session_state["ex2set3"] = False
 
-    if "exset3reps" not in st.session_state:
-        st.session_state["exset3reps"] = 0
+    if "ex2set3reps" not in st.session_state:
+        st.session_state["ex2set3reps"] = 0
 
-    if "currentset" not in st.session_state:
-        st.session_state["currentset"] = 1
+    if "2currentset" not in st.session_state:
+        st.session_state["2currentset"] = 1
 
     # ---- variable declarations ----
 
     current_session = st.session_state["session"]
     session_name = st.session_state['session_name']
     keys_list = list(current_session)
-    muscle = keys_list[0] # for exercise 1
+    muscle = keys_list[2] # for exercise 2
     muscle_justname = set_muscle_just_name(muscle)
     info = current_session[muscle]
     amount_of_exercises = len(current_session)
     options_range = range(1,amount_of_exercises+1) # SHOULD USE TO SHOW 1 of X remaining duh!
     active_user = st.session_state["active_user"]
-    current_set = st.session_state["currentset"]
+    current_set = st.session_state["2currentset"]
     # need function for this (and others tbf) to be dynamic but for now just static
     exercise_rest_time = get_rest_time_from_muscle(muscle_justname, session_name)
 
@@ -176,17 +176,17 @@ def run():
 
     # ---- PAGE START ----
 
-    st.title(f"Exericse 1 : {muscle_justname}")
+    st.title(f"Exericse 2 : {muscle_justname}")
     st.subheader(f":muscle: {session_name}")
 
     if info[2]:
-        st.markdown(f"##### [ 1 ] - {muscle_justname} - ")
+        st.markdown(f"##### [ 2 ] - {muscle_justname} - ")
         st.write(f"Modifier : {info[2]}")
         get_image_for_muscle_group(muscle_justname)
         st.write("##")
 
     elif info[2] == None:
-        st.markdown(f"##### [ 1 ] - {muscle_justname}")
+        st.markdown(f"##### [ 2 ] - {muscle_justname}")
         st.write("Modifier : Nope")
         get_image_for_muscle_group(muscle_justname)
         st.write("##")
@@ -227,7 +227,7 @@ def run():
             with psetcol4:
                 want_prev_weight = st.checkbox('Previous Weight', True)
                 want_prev_reps = st.checkbox('Previous Reps', False)
-                if st.session_state["currentset"] > 1:
+                if st.session_state["2currentset"] > 1:
                     want_prev_totweight = st.checkbox('Prev Total Weight', False)     
 
         #FIXME: Errors here if it doesn't find the pre-existing data, should be an easy enough fix tbf
@@ -236,10 +236,10 @@ def run():
         
             with psetcol1:
                 st.write("##### Set 1")
-                set1_reps_delta = st.session_state["exset1reps"] - set_1_reps
-                set1_weight_delta = st.session_state["exset1"] - set_1_weight
+                set1_reps_delta = st.session_state["ex2set1reps"] - set_1_reps
+                set1_weight_delta = st.session_state["ex2set1"] - set_1_weight
                 # exsetX stores the weight, defaults to false hence why use greater than 1 (i.e. any weight and not false turns it on)
-                if st.session_state["exset1"] > 1:
+                if st.session_state["ex2set1"] > 1:
                     if want_prev_weight:
                         st.metric(label="Previous Weight", value=f"{set_1_weight} KG", delta=f"{set1_weight_delta} KG today")
                     if want_prev_reps:
@@ -250,18 +250,18 @@ def run():
                     if want_prev_reps:
                         st.metric(label="Previous Reps", value=f"{set_1_reps} reps")
 
-                if st.session_state["currentset"] > 1:
+                if st.session_state["2currentset"] > 1:
                     if want_prev_totweight:
-                        set1_current_session_tot_weight = st.session_state["exset1"] * st.session_state["exset1reps"]
+                        set1_current_session_tot_weight = st.session_state["ex2set1"] * st.session_state["ex2set1reps"]
                         set1_tot_weight_delta = set1_current_session_tot_weight - set_1_total_weight
                         st.metric(label="Previ Total Weight", value=f"{set_1_total_weight} reps", delta=f"{set1_tot_weight_delta} kg lifted today")
 
             with psetcol2:
                 st.write("##### Set 2")
-                set2_reps_delta = st.session_state["exset2reps"] - set_2_reps
-                set2_weight_delta = st.session_state["exset2"] - set_2_weight
+                set2_reps_delta = st.session_state["ex2set2reps"] - set_2_reps
+                set2_weight_delta = st.session_state["ex2set2"] - set_2_weight
 
-                if st.session_state["exset2"] > 1:
+                if st.session_state["ex2set2"] > 1:
                     if want_prev_weight:
                         st.metric(label="Previous Weight", value=f"{set_2_weight} KG", delta=f"{set2_weight_delta} KG today")
                     if want_prev_reps:
@@ -272,18 +272,18 @@ def run():
                     if want_prev_reps:
                         st.metric(label="Previous Reps", value=f"{set_2_reps} reps")
 
-                if st.session_state["currentset"] > 2:
+                if st.session_state["2currentset"] > 2:
                     if want_prev_totweight:
-                        set2_current_session_tot_weight = st.session_state["exset2"] * st.session_state["exset2reps"]
+                        set2_current_session_tot_weight = st.session_state["ex2set2"] * st.session_state["ex2set2reps"]
                         set2_tot_weight_delta = set2_current_session_tot_weight - set_2_total_weight
                         st.metric(label="Previ Total Weight", value=f"{set_2_total_weight} reps", delta=f"{set2_tot_weight_delta} kg lifted today")
 
             with psetcol3:
                 st.write("##### Set 3")
-                set3_reps_delta = st.session_state["exset3reps"] - set_3_reps
-                set3_weight_delta = st.session_state["exset3"] - set_3_weight
+                set3_reps_delta = st.session_state["ex2set3reps"] - set_3_reps
+                set3_weight_delta = st.session_state["ex2set3"] - set_3_weight
 
-                if st.session_state["exset3"] > 1:
+                if st.session_state["ex2set3"] > 1:
                     if want_prev_weight:
                         st.metric(label="Previous Weight", value=f"{set_3_weight} KG", delta=f"{set3_weight_delta} KG today")
                     if want_prev_reps:
@@ -294,7 +294,7 @@ def run():
                     if want_prev_reps:
                         st.metric(label="Previous Reps", value=f"{set_3_reps} reps")
 
-                if st.session_state["currentset"] > 3:
+                if st.session_state["2currentset"] > 3:
                     if want_prev_totweight:
                         set3_current_session_tot_weight = st.session_state["exset3"] * st.session_state["exset3reps"]
                         set3_tot_weight_delta = set3_current_session_tot_weight - set_3_total_weight
@@ -308,32 +308,32 @@ def run():
     with st.expander("Sets For Exercise", True):
         setcol1, setcol2, setcol3, setcol4 = st.columns(4)
         
-        if (st.session_state["currentset"]) < 4:
+        if (st.session_state["2currentset"]) < 4:
             setcol4.write("Current Set")
-            setcol4.write(st.session_state["currentset"])
+            setcol4.write(st.session_state["2currentset"])
         else:
             setcol4.markdown("""### COMPLETE """)
         
-        if st.session_state["exset1reps"] < 1:
+        if st.session_state["ex2set1reps"] < 1:
             setcol1.write(":x:")
-        elif st.session_state["exset1reps"] > 1:
-            set1_reps = st.session_state["exset1reps"]
+        elif st.session_state["ex2set1reps"] > 1:
+            set1_reps = st.session_state["ex2set1reps"]
             setcol1.write(f"{set1_reps} reps :white_check_mark:")
         else:
             setcol1.write(":white_check_mark:")
 
-        if st.session_state["exset2reps"] < 1:
+        if st.session_state["ex2set2reps"] < 1:
             setcol2.write(":x:")
-        elif st.session_state["exset2reps"] > 1:
-            set2_reps = st.session_state["exset2reps"]
+        elif st.session_state["ex2set2reps"] > 1:
+            set2_reps = st.session_state["ex2set2reps"]
             setcol2.write(f"{set2_reps} reps :white_check_mark:")
         else:
             setcol2.write(":white_check_mark:")
 
-        if st.session_state["exset3reps"] < 1:
+        if st.session_state["ex2set3reps"] < 1:
             setcol3.write(":x:")
-        elif st.session_state["exset3reps"] > 1:
-            set3_reps = st.session_state["exset3reps"]
+        elif st.session_state["ex2set3reps"] > 1:
+            set3_reps = st.session_state["ex2set3reps"]
             setcol3.write(f"{set3_reps} reps :white_check_mark:")
         else:
             setcol3.write(":white_check_mark:")
@@ -341,7 +341,7 @@ def run():
 
     # ---- EXERCISE LOGGGER FORM ----
     ## if 4th set hide form, else show 
-    if (st.session_state["currentset"]) < 4:
+    if (st.session_state["2currentset"]) < 4:
         with st.form(key=f"exercise_logger_1"):
 
             logcol1, logcol2, logcol3 = st.columns([3,2,1])
@@ -366,23 +366,23 @@ def run():
             # ---- SUBMIT EXERCISE FORM LOGIC ----
             if submit_exercise_log:
 
-                update_db((active_user, "001", session_name, f"1.{muscle_justname}", current_set, the_reps, the_weight, the_reps*the_weight, exercise_rest_time))
+                update_db((active_user, "001", session_name, f"2.{muscle_justname}", current_set, the_reps, the_weight, the_reps*the_weight, exercise_rest_time))
 
                 coltime, colres = st.columns([2,2])
                 with colres:
                     with st.expander("Results"):
                         weight_lifted = [the_reps*the_weight]
                         if current_set == 1:
-                            st.session_state["exset1reps"] = the_reps
+                            st.session_state["ex2set1reps"] = the_reps
                             df = pd.DataFrame({"set1":weight_lifted})
                         elif current_set == 2:
-                            st.session_state["exset2reps"] = the_reps
-                            set1totweight = st.session_state["exset1reps"] * st.session_state["exset1"]
+                            st.session_state["ex2set2reps"] = the_reps
+                            set1totweight = st.session_state["ex2set1reps"] * st.session_state["ex2set1"]
                             df = pd.DataFrame({"set1":set1totweight,"set2":weight_lifted})
                         elif current_set == 3:
-                            st.session_state["exset3reps"] = the_reps
-                            set1totweight = st.session_state["exset1reps"] * st.session_state["exset1"]
-                            set2totweight = st.session_state["exset2reps"] * st.session_state["exset2"]
+                            st.session_state["ex2set3reps"] = the_reps
+                            set1totweight = st.session_state["ex2set1reps"] * st.session_state["ex2set1"]
+                            set2totweight = st.session_state["ex2set2reps"] * st.session_state["ex2set2"]
                             df = pd.DataFrame({"set1":set1totweight,"set2":set2totweight,"set3":weight_lifted})
                         st.dataframe(df.T)
                 with coltime:
@@ -394,7 +394,8 @@ def run():
                                 #st.session_state["exset1"] = True
                                 st.experimental_rerun()
 
-    if (st.session_state["currentset"]) >= 4:
+
+    if (st.session_state["2currentset"]) >= 4:
         st.write("##")
         # BUTTON FOR NEXT EXERCISE & SOME STATS N SHIT (& share but not rn) maybe nice to have next name too but text
         # should legit just go, could pass args if needed but shouldnt really need to tbf?
@@ -403,23 +404,23 @@ def run():
             _,_,tendcol1,tendcol2 = st.columns(4)
             tendcol1.write('#### NEXT UP >>')
             tendcol1.write('exercise name')
-            tendcol2.button('GO TO EXERCISE 2')
+            tendcol2.button('GO TO EXERCISE 3')
 
         with st.container():
             endcol1,endcol2 = st.columns([2,1])
             
             st.write("You lifted blah")
-            set1totweight = st.session_state["exset1reps"] * st.session_state["exset1"]
-            set2totweight = st.session_state["exset2reps"] * st.session_state["exset2"]
-            set3totweight = st.session_state["exset3reps"] * st.session_state["exset3"]
-            final_ex1_totweight = set1totweight + set2totweight + set3totweight
+            set1totweight = st.session_state["ex2set1reps"] * st.session_state["ex2set1"]
+            set2totweight = st.session_state["ex2set2reps"] * st.session_state["ex2set2"]
+            set3totweight = st.session_state["ex2set3reps"] * st.session_state["ex2set3"]
+            final_ex2_totweight = set1totweight + set2totweight + set3totweight
 
             # NEED FIX DELTA, AND OBVS NEEDS CHECK FOR IF DATA EXISTS FIRST - LEGIT JUST USE DB QUERIES MORE
             # - START TRACKING IN DETAIL EVERY SINGLE VAR YOU NEED!
 
-            st.metric(label="Ex1 Weight Lifted", value=f"{final_ex1_totweight} KG", delta=f"{0} kg from last session")    
+            st.metric(label="Ex2 Weight Lifted", value=f"{final_ex2_totweight} KG", delta=f"{0} kg from last session")    
             
-            compare_weight_tuple = get_weight_comparision(final_ex1_totweight)
+            compare_weight_tuple = get_weight_comparision(final_ex2_totweight)
             st.write(compare_weight_tuple)
 
             st.write("##")
