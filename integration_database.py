@@ -150,10 +150,50 @@ def db_create_user(user_name):
     create_usersession_table(user_name)
 
 
-def add_exercise_set_data_to_db(user_name, sessionName, muscleNumb, setNumb, setReps, setWeight, setTotalWeight, setRest):
-    add_exercise_set_data_query = f"INSERT INTO {user_name}_sessions (userID, SessionID, SessionName, MuscleNumbGroup, SetNumb, SetReps, SetWeight, SetTotalWeight, setRest) VALUES ('{user_name}', '1', '{sessionName}', '{muscleNumb}', {setNumb}, {setReps}, {setWeight}, {setTotalWeight}, {setRest})"
+def add_exercise_set_data_to_db(user_name, sessionID, sessionName, muscleNumb, setNumb, setReps, setWeight, setTotalWeight, setRest):
+    """" self referencing af """
+    add_exercise_set_data_query = f"INSERT INTO {user_name}_sessions (userID, SessionID, SessionName, MuscleNumbGroup, SetNumb, SetReps, SetWeight, SetTotalWeight, setRest) VALUES ('{user_name}', '{sessionID}', '{sessionName}', '{muscleNumb}', {setNumb}, {setReps}, {setWeight}, {setTotalWeight}, {setRest})"
     add_to_db(add_exercise_set_data_query)
     print(f"{user_name} - Set {setNumb} Written For {muscleNumb}")
+
+
+def get_previous_sessionid_and_return_current(user_name):
+    """ RENAME THIS WTF JESUS MAN, it doesnt actually get the previous so dont say that, get the previous session id by using the username, really need to make this an int tho """
+    get_prev_sessionid_query = f"SELECT sessionid, setnumb FROM {user_name}_sessions ORDER BY sessionid DESC LIMIT 1"
+    prev_sessionid = get_from_db(get_prev_sessionid_query)
+    prev_sessionid = prev_sessionid[0][0]
+    prev_sessionid = int(prev_sessionid) + 1
+    return(prev_sessionid)
+
+
+def get_last_sessionid_from_current(user_name):
+    """ get the previous session id by using the username """
+    get_prev_sessionid_query = f"SELECT sessionid, setnumb FROM {user_name}_sessions ORDER BY sessionid DESC LIMIT 1"
+    prev_sessionid = get_from_db(get_prev_sessionid_query)
+    prev_sessionid = prev_sessionid[0][0]
+    prev_sessionid = int(prev_sessionid) - 1
+    return(prev_sessionid)
+
+
+def find_previous_sets_for_muscle(user_name:str, sessionName:str, muscleNumb:str) -> tuple:
+    """
+    find previous performed set by the user for the given muscle group 
+    obvs just poc as needs to be for equipment/exercise specific not muscle specific
+    logic wont change much once equipment is implemented since exercise names are/will be unique
+    """
+    # could grab prev session id from existing function using username - tbf could just pass it tho lol
+    # dont actually need this, can just grab the last ig anyway by ordering by this col and not returning/using the value for the col
+    # add timestamp, makes this easier - then id can truly be an id too
+    # keeping this tho actually as just makes it easier, sure if always 3 sets np, but with increasing set counts would become problematic 
+    prevSessionID = get_last_sessionid_from_current(user_name)
+    # print(f"{prevSessionID = }")
+    # print(f"{sessionName = }")
+    # print(f"{muscleNumb = }")
+    get_previous_set_query = f"SELECT SetNumb, SetReps, SetWeight, SetTotalWeight FROM user_sessions WHERE sessionName = '{sessionName}' AND muscleNumbGroup = '{muscleNumb}' AND sessionid = '{prevSessionID}'"
+    previous_set = get_from_db(get_previous_set_query)
+    print(f"{previous_set = }")
+    return(previous_set)
+
 
 
 # ---- MAIN ----

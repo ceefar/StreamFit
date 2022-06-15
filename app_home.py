@@ -28,6 +28,14 @@ def grab_base_template_info(user_selection_int, url):
 def create_user_db_tables(user_name:str):
     fitdb.db_create_user(user_name)
 
+@st.cache
+def set_sessionID(user_name:str) -> int:
+    """ basically just an increment var for each session so can display data from the previous session, sets to sessionstate so can be passed to other app pages """
+    sessionID = fitdb.get_previous_sessionid_and_return_current(user_name)
+    if f"{user_name}_sessionID" not in st.session_state:
+        st.session_state[f"{user_name}_sessionID"] = sessionID
+        print(f'{st.session_state[f"{user_name}_sessionID"] = }')
+
 
 # ---- main page ----
 
@@ -65,6 +73,7 @@ def run():
         st.write('The current Username is', user_name)
         if st.checkbox('Create User Account'):
             create_user_db_tables(user_name)
+            set_sessionID(user_name)
             if "active_user" not in st.session_state:
                 st.session_state["active_user"] = user_name
 

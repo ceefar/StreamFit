@@ -7,19 +7,46 @@ page reruns
 the information fills any persisting fields from the database
 and provides the logic for things like sets etc
 
+in this v0.2 version essentially treating muscle group like the equipment,
+again isnt a big leap to implement equipment after this tho i do want the logic for it to be dynamic
+
+
+RNRN
+- the dropdown comparison to last set now the session id works
+- then running metric at bottom or whatever that then will become more prominent on session ends
+- then exercise 2, with button for when complete to go to next page (could pass stuff to it too if did want to oooo)
+- basic dynamic timer? (own table (nah) or tbf own logic/function for it duh!)
+- exercise/mg info and else similar? (or wait til equipment?)
+- then actually tbh need to add the equipment stuff otherwise wtf are you tracking lmao
+    - at this point refactor likely best but thats fine
+    - MAKE SESSION ID AN INT!
+    - ADD TIMESTAMP
+    - MAKE SESSION ID AN ACTUAL SESSION ID BUT CREATE A NEW SESSION NUMBER TOO!
+    - BE SURE TO STRIP STRINGS WHEN ADDED TO DB
+
 
 RN
-if set4 wipe everything and make dem continue - or sumnt similar maybe its just like a stats bit just the metric whatever its so sick omg
+obvs you're not actually selecting any equipment yet or being recommended it or anything modifiers based on the type of the exercise!
 exercise 2
+add drop all tables functionality (button) to home page (needs a new db function tbf) - this will then be an admin only thing
+can/should use side bar more
 
 
 DB
 create id - even if simple but just so is done duh (with name anonymity?)
 verification for if you exist or not and simple db login!!!!!! - legit already have the code bosh af
-show previous set in new dropdown by current info if vlaid
+show previous set in new dropdown by current info if valid
 do simple running metric
+should include datetime of session btw
+make session id an int 
+add new session id for actual id style id (use uuid?)
 
 
 YOU GOTTA THINK MORE MVP!
 e.g.
 - you dont need set timer and dynamic timer, just have it be dynamic only at the start!
+
+
+FUTURE
+- obvs must set up so when user hits timer logic happens, so they can also skip the timer should they wish without logic errors
+- if that requires an extra button press by them (i.e. to force rerun) that is fine 
