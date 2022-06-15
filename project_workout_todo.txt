@@ -1,22 +1,36 @@
-SO
-legit just do this through database and form
-so user enters that form info
-timer starts
-timer ends
-page reruns
-the information fills any persisting fields from the database
-and provides the logic for things like sets etc
-
-in this v0.2 version essentially treating muscle group like the equipment,
-again isnt a big leap to implement equipment after this tho i do want the logic for it to be dynamic
 
 
 RNRN
-- the dropdown comparison to last set now the session id works
+
 - then running metric at bottom or whatever that then will become more prominent on session ends
-- then exercise 2, with button for when complete to go to next page (could pass stuff to it too if did want to oooo)
-- basic dynamic timer? (own table (nah) or tbf own logic/function for it duh!)
+    - skip for now but still do in this "sprint/version" 
+        - include stuff for like total time on session
+        - the real world weight comparisons <3
+        - basic metric idea for like "predicted improvement" (i.e. how many more sessions at which it thinks you'll be able to increase the weights)
+        - weeks on exercise (obvs only need for equipment), is a big one tho as leave to early isnt ideal, and neither is late!
+        - rate of progress (defo dont do now) but like a chart that maps it over time, could do a dummy now tbf
+        - many others for sure
+
+*after tested if is ok move to done*
+- basic dynamic timer? (own table (nah) or tbf own logic/function for it duh!) [DONE, NOT TRULY TESTED, RUDIMENTARY AF]
+    - yeah own function in a different file! (integration_workout!)
+
+
+
+- quickly do end stuff basic -> real world comparison etc just to test!
+    - (and other stuff (see above) like weeks on exercise etc, dummy charts etc, dummy data is fine for now but needs to be done properly in terms of planning for db!)
+    - lifted this session week month etc (running)
+
+- then exercise 2 basic, with button for when complete to go to next page (could pass stuff to it too if did want to oooo)
+
 - exercise/mg info and else similar? (or wait til equipment?)
+
+- some basic "modifier" logic before 1st big refactor
+    - remember need this functionality to be good as will be adding my own modifiers which allow for like heavy long rest or short explosive/lighter etc is important tho 
+
+- the basic functionality for if 11,11,11 (close to ceiling) then prompt to increase weight
+    - initially just do based on an arbitrary value, but for proper (needs planning) obvs need sets n rep range to be preset or dynamically provided
+
 - then actually tbh need to add the equipment stuff otherwise wtf are you tracking lmao
     - at this point refactor likely best but thats fine
     - MAKE SESSION ID AN INT!
@@ -42,6 +56,11 @@ make session id an int
 add new session id for actual id style id (use uuid?)
 
 
+IMPORTANT
+- tapping prev total weight (or any selector ig) while timer is going will just end the timer, need a fix for this!
+- lbs and kg converter functions
+
+
 YOU GOTTA THINK MORE MVP!
 e.g.
 - you dont need set timer and dynamic timer, just have it be dynamic only at the start!
@@ -50,3 +69,22 @@ e.g.
 FUTURE
 - obvs must set up so when user hits timer logic happens, so they can also skip the timer should they wish without logic errors
 - if that requires an extra button press by them (i.e. to force rerun) that is fine 
+
+
+GENERAL CONCEPT FOR CURRENT VERSION
+legit just do this through database and form
+so user enters that form info
+timer starts
+timer ends
+page reruns
+the information fills any persisting fields from the database
+and provides the logic for things like sets etc
+
+in this v0.2 version essentially treating muscle group like the equipment,
+again isnt a big leap to implement equipment after this tho i do want the logic for it to be dynamic
+
+
+
+DONE
+- the dropdown comparison to last set now the session id works [DONE]
+- if doing a session for first time fix error [THINK DONE - HAVEN'T THOROUGHLY TESTED THO]

@@ -71,7 +71,7 @@ def run():
         # have it default to user ig
         user_name = st.text_input('Enter Your Name', 'user')
         st.write('The current Username is', user_name)
-        if st.checkbox('Create User Account'):
+        if st.checkbox('Activate User Account'):
             create_user_db_tables(user_name)
             set_sessionID(user_name)
             if "active_user" not in st.session_state:

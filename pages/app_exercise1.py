@@ -8,9 +8,9 @@ import pandas as pd
 from time import sleep
 # for images
 from PIL import Image
-# for db access
+# integrations for db access, workout calculations 
 import integration_database as fitdb
-
+import integration_workout as wocalc
 
 # ---- functions ----
 
@@ -109,6 +109,17 @@ def section_previous_set_data(previous_set:tuple) -> tuple:
         set_2 = previous_set[1]
         set_3 = previous_set[2]
     
+@st.cache
+def get_rest_time_from_muscle(mg:str, split:str) -> int:
+    rest_time = wocalc.calculate_rest_time_v0(mg, split)
+    print(f"{rest_time = }")
+    return(rest_time)
+
+@st.cache
+def get_weight_comparision(weight:int) -> tuple[str,float,str]:
+    compare_tuple = wocalc.get_real_world_weight_comparison(weight)
+    print(f"{compare_tuple = }")
+    return(compare_tuple)
 
 # ---- START MAIN EXERCISE PAGE APP ----
 
@@ -154,7 +165,13 @@ def run():
     active_user = st.session_state["active_user"]
     current_set = st.session_state["currentset"]
     # need function for this (and others tbf) to be dynamic but for now just static
-    exercise_rest_time = 15
+    exercise_rest_time = get_rest_time_from_muscle(muscle_justname, session_name)
+
+    #print(f"{info = }")
+    #print(f"{muscle_justname = }")
+    #print(f"{muscle = }")
+    #print(f"{session_name = }")
+    #print(f"{current_session = }") 
 
 
     # ---- PAGE START ----
@@ -179,48 +196,112 @@ def run():
     # need some basic validation for if actually has stats (since may not, and much more likely once equipment), would still like some dummy/cute data or even explainer in its place
     # ---- PREVIOUS SETS COMPARISON EXPANDER [ALPHA] ----
     with st.expander(f"Previous Stats For {muscle_justname}"):
-        psetcol1, psetcol2, psetcol3, psetcol4 = st.columns(4)
+            
+
         previous_set = grab_previous_set_data(active_user, session_name, muscle_justname)
         amount_of_sets = len(previous_set)
-        if amount_of_sets == 3:
-            set_1 = previous_set[0]
-            set_2 = previous_set[1]
-            set_3 = previous_set[2]
-
-            set_1_reps, set_1_weight, set_1_total_weight = set_1[1], set_1[2], set_1[3]
-            set_2_reps, set_2_weight, set_2_total_weight = set_2[1], set_2[2], set_2[3]
-            set_3_reps, set_3_weight, set_3_total_weight = set_3[1], set_3[2], set_3[3]
-
-
-            set_1_weight = float(set_1_weight)
-            set_1_total_weight = float(set_1_total_weight)
-
-            set_2_weight = float(set_2_weight)
-            set_2_total_weight = float(set_2_total_weight)
-
-            set_3_weight = float(set_3_weight)
-            set_3_total_weight = float(set_3_total_weight)
         
+        if previous_set:
+
+            if amount_of_sets == 3:
+
+                psetcol1, psetcol2, psetcol3, psetcol4 = st.columns(4)
+
+                set_1 = previous_set[0]
+                set_2 = previous_set[1]
+                set_3 = previous_set[2]
+
+                set_1_reps, set_1_weight, set_1_total_weight = set_1[1], set_1[2], set_1[3]
+                set_2_reps, set_2_weight, set_2_total_weight = set_2[1], set_2[2], set_2[3]
+                set_3_reps, set_3_weight, set_3_total_weight = set_3[1], set_3[2], set_3[3]
+
+                set_1_weight = float(set_1_weight)
+                set_1_total_weight = float(set_1_total_weight)
+
+                set_2_weight = float(set_2_weight)
+                set_2_total_weight = float(set_2_total_weight)
+
+                set_3_weight = float(set_3_weight)
+                set_3_total_weight = float(set_3_total_weight)
+
+            with psetcol4:
+                want_prev_weight = st.checkbox('Previous Weight', True)
+                want_prev_reps = st.checkbox('Previous Reps', False)
+                if st.session_state["currentset"] > 1:
+                    want_prev_totweight = st.checkbox('Prev Total Weight', False)     
+
+        #FIXME: Errors here if it doesn't find the pre-existing data, should be an easy enough fix tbf
         # should note to user that increase weight is always best more clearly
         # possibly a toggle for show weight reps or total weight in col4? - defo test this tbf
-
-        with psetcol1:
-            set1_reps_delta = set_1_reps - st.session_state["exset1reps"]
-            st.metric(label="Previous Reps", value=f"{set_1_reps} reps", delta=f"{set1_reps_delta} reps today")
-
-            if st.session_state["exset1"] > 1:
-                set1_weight_delta = set_1_weight - st.session_state["exset1"]
-                st.metric(label="Previous Weight", value=f"{set_1_weight} KG", delta=f"{set1_weight_delta} KG today")
-
-            set1_current_session_tot_weight = st.session_state["exset1"] * st.session_state["exset1reps"]
-            set1_tot_weight_delta = set_1_total_weight - set1_current_session_tot_weight
-            st.metric(label="Previ Total Weight", value=f"{set_1_total_weight} reps", delta=f"{set1_tot_weight_delta} lifted today")
-
         
+            with psetcol1:
+                st.write("##### Set 1")
+                set1_reps_delta = st.session_state["exset1reps"] - set_1_reps
+                set1_weight_delta = st.session_state["exset1"] - set_1_weight
+                # exsetX stores the weight, defaults to false hence why use greater than 1 (i.e. any weight and not false turns it on)
+                if st.session_state["exset1"] > 1:
+                    if want_prev_weight:
+                        st.metric(label="Previous Weight", value=f"{set_1_weight} KG", delta=f"{set1_weight_delta} KG today")
+                    if want_prev_reps:
+                        st.metric(label="Previous Reps", value=f"{set_1_reps} reps", delta=f"{set1_reps_delta} reps today")
+                else:
+                    if want_prev_weight:
+                        st.metric(label="Previous Weight", value=f"{set_1_weight} KG")
+                    if want_prev_reps:
+                        st.metric(label="Previous Reps", value=f"{set_1_reps} reps")
 
+                if st.session_state["currentset"] > 1:
+                    if want_prev_totweight:
+                        set1_current_session_tot_weight = st.session_state["exset1"] * st.session_state["exset1reps"]
+                        set1_tot_weight_delta = set1_current_session_tot_weight - set_1_total_weight
+                        st.metric(label="Previ Total Weight", value=f"{set_1_total_weight} reps", delta=f"{set1_tot_weight_delta} kg lifted today")
 
+            with psetcol2:
+                st.write("##### Set 2")
+                set2_reps_delta = st.session_state["exset2reps"] - set_2_reps
+                set2_weight_delta = st.session_state["exset2"] - set_2_weight
 
+                if st.session_state["exset2"] > 1:
+                    if want_prev_weight:
+                        st.metric(label="Previous Weight", value=f"{set_2_weight} KG", delta=f"{set2_weight_delta} KG today")
+                    if want_prev_reps:
+                        st.metric(label="Previous Reps", value=f"{set_2_reps} reps", delta=f"{set2_reps_delta} reps today")
+                else:
+                    if want_prev_weight:
+                        st.metric(label="Previous Weight", value=f"{set_2_weight} KG")
+                    if want_prev_reps:
+                        st.metric(label="Previous Reps", value=f"{set_2_reps} reps")
 
+                if st.session_state["currentset"] > 2:
+                    if want_prev_totweight:
+                        set2_current_session_tot_weight = st.session_state["exset2"] * st.session_state["exset2reps"]
+                        set2_tot_weight_delta = set2_current_session_tot_weight - set_2_total_weight
+                        st.metric(label="Previ Total Weight", value=f"{set_2_total_weight} reps", delta=f"{set2_tot_weight_delta} kg lifted today")
+
+            with psetcol3:
+                st.write("##### Set 3")
+                set3_reps_delta = st.session_state["exset3reps"] - set_3_reps
+                set3_weight_delta = st.session_state["exset3"] - set_3_weight
+
+                if st.session_state["exset3"] > 1:
+                    if want_prev_weight:
+                        st.metric(label="Previous Weight", value=f"{set_3_weight} KG", delta=f"{set3_weight_delta} KG today")
+                    if want_prev_reps:
+                        st.metric(label="Previous Reps", value=f"{set_3_reps} reps", delta=f"{set3_reps_delta} reps today")
+                else:
+                    if want_prev_weight:
+                        st.metric(label="Previous Weight", value=f"{set_3_weight} KG")
+                    if want_prev_reps:
+                        st.metric(label="Previous Reps", value=f"{set_3_reps} reps")
+
+                if st.session_state["currentset"] > 3:
+                    if want_prev_totweight:
+                        set3_current_session_tot_weight = st.session_state["exset3"] * st.session_state["exset3reps"]
+                        set3_tot_weight_delta = set3_current_session_tot_weight - set_3_total_weight
+                        st.metric(label="Prev Total Weight", value=f"{set_3_total_weight} reps", delta=f"{set3_tot_weight_delta} kg lifted today")    
+        
+        else:
+            st.write("##### No Previous Set Info")
 
 
     # ---- CURRENT SETS TRACKER EXPANDER ----
@@ -313,10 +394,35 @@ def run():
                                 #st.session_state["exset1"] = True
                                 st.experimental_rerun()
 
+    if (st.session_state["currentset"]) >= 4:
+        st.write("##")
+        # BUTTON FOR NEXT EXERCISE & SOME STATS N SHIT (& share but not rn) maybe nice to have next name too but text
+        # should legit just go, could pass args if needed but shouldnt really need to tbf?
+        # looks ugly af rn but meh can improve in future is just to show basic flow/logic/idea for personal project mvp
+        with st.container():
+            _,_,tendcol1,tendcol2 = st.columns(4)
+            tendcol1.write('#### NEXT UP >>')
+            tendcol1.write('exercise name')
+            tendcol2.button('GO TO EXERCISE 2')
+
+        with st.container():
+            endcol1,endcol2 = st.columns([2,1])
+            
+            st.write("You lifted blah")
+            st.metric()
+            final_ex1_totweight = set1_current_session_tot_weight + set2_current_session_tot_weight + set3_current_session_tot_weight
+            st.metric(label="Ex1 Weight Lifted", value=f"{final_ex1_totweight} KG", delta=f"{set3_tot_weight_delta} kg from last session")    
+            
+            #compare_weight_tuple = get_weight_comparision(final_ex1_totweight)
+            
+            endcol2.success("NEW PB - LEGOOOOO!")
+
+
 
 
 def show_running_info():
     """ for the current session """
+    # maybe have as a general function, not as a streamlit specific, and it just returns what is needed for the streamlit sections like metric or whatever
     st.write("Make Me A Metric")
 
 
