@@ -176,6 +176,8 @@ def run():
 
     # ---- PAGE START ----
 
+    # note has to be almost one of the first things you do right, so just get a basic for now on new branch anyway so chill
+
     st.title(f"Exericse 1 : {muscle_justname}")
     st.subheader(f":muscle: {session_name}")
 
