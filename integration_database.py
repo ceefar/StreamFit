@@ -159,6 +159,7 @@ def get_all_equip_for_mg(mg):
 
     print(f"{equip_tuple = }")
     print(f"{equip_tuple[0] = }")
+    return(equip_tuple)
 
 
 
