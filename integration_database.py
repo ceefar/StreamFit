@@ -5,6 +5,8 @@ import os
 from dotenv import load_dotenv
 # for csv
 import csv
+# for filling equipment/exercise db tables
+import integration_scrape_exrx as fitdb
 # ---- END IMPORTS ----
 
 
@@ -142,6 +144,92 @@ def check_if_usersession_table_exists(user_name:str = "") -> str:
 # ---- END WORKOUT SESSION DB SETUP ----
 
 
+
+# ---- START EQUIPMENT EXERCISES DB SETUP ----
+
+def create_all_chest_tables():
+    """ allows to go through web scrapped data and manually configure tables with ease """
+    chest_data = fitdb.get_all_exercises_from_mg_chest()
+
+    current_main_mg = "Chest-Main"
+    current_main_equip = "Assisted"
+    table_name = 'chest_main'
+
+    for exercise in chest_data:
+        print("\n\n")
+        print(f"MG : {current_main_mg}, EQUIP : {current_main_equip}")
+        print(f"NAME : {exercise[0]}, LINK : {exercise[1]}")
+
+        user_select = int(input("\n[ 1 ] -  Add/Skip Item\n[ 2 ] -  Do Other (Update MG, Equip, Table)\nYour Selection : ")) # should have drop and quit for debug but meh, also could have end, view all, update etc but for now is fine
+        
+        if user_select == 2:
+            while True:
+                
+                user_select = int(input("[ 1 ] -  Create New Table\n[ 2 ] -  Update Main MG\n[ 3 ] -  Update Main Equip\n[ 0 ] - Zero To Quit\nYour Selection : ")) # should have drop and quit for debug but meh, also could have end, view all, update etc but for now is fine
+
+                if user_select == 0:
+                    break
+
+                if user_select == 1:
+                    table_name = input("Enter Table Name : ")
+                    create_new_table_query = f"CREATE TABLE IF NOT EXISTS {table_name} (exName VARCHAR(255), mainMuscle VARCHAR(255), exParent VARCHAR(255), mainEquip VARCHAR(255), equipAttach VARCHAR(255), exUtility VARCHAR(255), exMechanics VARCHAR(255), exForce VARCHAR(255), mainMuscleSynergists VARCHAR(255), mainMuscleStabalisers VARCHAR(255), exLink VARCHAR(255))"
+                    add_to_db(create_new_table_query)
+
+                if user_select == 2:
+                    current_main_mg = input(f"Current MG = {current_main_mg}, Enter New Name : ")
+
+                if user_select == 3:
+                    current_main_equip = input(f"Current Equip = {current_main_equip}, Enter New Name : ")
+                
+                if user_select == 0:
+                    break
+
+        print("\n\n")
+        print(f"MG : {current_main_mg}, EQUIP : {current_main_equip}")
+        print(f"NAME : {exercise[0]}, LINK : {exercise[1]}")
+        user_select = int(input("\n[ 2 ] -  Add Item\n[ 3 ] -  Skip Item\nYour Selection : ")) # should have drop and quit for debug but meh, also could have end, view all, update etc but for now is fine
+
+        print("")
+        
+        if user_select == 3:
+                continue
+
+        if user_select == 2:
+                print(f"Name To Add = {exercise[0]}")
+                print(f"MG To Add = {current_main_mg}")
+                print(f"Equip To Add = {current_main_equip}")
+                print(f"Link To Add = {exercise[1]}")
+                print(f"Into Table = {table_name}")
+
+                parentinput = input(f"Add Parent = ")
+                attachinput = input(f"Add Attachment = ")
+
+                add_exercise_query = f"INSERT INTO {table_name} (exName, mainMuscle, exParent, mainEquip, equipAttach, exLink) VALUES ('{exercise[0]}','{current_main_mg}','{parentinput}','{current_main_equip}','{attachinput}','{exercise[1]}')"
+                add_to_db(add_exercise_query)
+        
+
+    # 100% WANT A IS_POPULAR TAG/FLAG (as col)
+
+    # LOL - mgs dont change enum would have been decent?! - consider for first refactor and when doing all exercises
+    # FUNNILY ENOUGH THIS COULD BE CREATED LIKE AN ADMIN PANEL WITH A GUI USING STREAMLIT TOO! (little mini mini project for future?! - would be an awesome addition to show employers)
+
+    # so need an option to create new table as there are cut offs
+    # need option to skip a field
+    # when adding prompt before to add its parent (should really display list of all parents too and then just allow to select one cause spelling but meh)
+    # need links to be full not this shit (have that field at the end end)
+    # could add is base+compound but is easy enough to get with a query so meh
+    # also need specifics (tho can web scrap them dynamically) for utility mechanics force main mg, 
+    #       - main synergists(there are lots so will scrape the rest for outputs), main stabalisers
+    #       - else can be scraped for display to user
+    #       - so just add the needed fields, will only be adding in now semi-manually, equipment, attachment (if has), parent (if has)
+    #       - auto fields, main mg, equipment, name (done), link (done) 
+
+
+
+# ---- START EQUIPMENT EXERCISES DB SETUP ----
+
+
+
 # ---- INTEGRATIONS TEST 1 ----
 
 def db_create_user(user_name):
@@ -215,7 +303,8 @@ def main():
 
 # driver... vrmmmm
 if __name__=='__main__':
-    main()
+    create_all_chest_tables()
+    #main()
 
 # ---- END DRIVER ----
 
@@ -225,3 +314,7 @@ if __name__=='__main__':
 
 # print(f"{variable_name = }")
 # print(f"{type(variable_name) = }")
+
+
+# ---- QUERIES IM TOO SCARED TO DELETE LOL ----
+# SELECT sessionid, setnumb FROM user_sessions ORDER BY sessionid DESC LIMIT 1

@@ -8,7 +8,7 @@ RNRN
 - exercise/mg info and else similar? (or wait til equipment?)
     - yeah just do basic and do it using webscaping ooooo!
     - N0TE PROBS JUST DO THE ACTUAL EXERCISES MANUALLY THEN ADD IN THE INFORMATION DYNAMICALLY! (since children n shit n no tags)
-        - maybe in theory can do it tho idk, maybe its like half and half, pull the date using bs4 then basically manually edit it heavily per page
+        - maybe in theory can do it tho idk, maybe its like half and half, pull the data using bs4 then basically manually edit it heavily per page
             - NOTE should just bang it in DB TABLES FOR EACH MUSCLE DUHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH!!!!! <<<<<<<<<< THIS!
                 - legit only need to do for chest to start duh!
                     - NOTE add a basic equipment selector too! - dropdown or sumnt oooo!!!!
