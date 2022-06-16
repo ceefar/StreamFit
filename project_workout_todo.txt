@@ -12,6 +12,7 @@ RNRN
             - NOTE should just bang it in DB TABLES FOR EACH MUSCLE DUHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH!!!!! <<<<<<<<<< THIS!
                 - legit only need to do for chest to start duh!
                     - NOTE add a basic equipment selector too! - dropdown or sumnt oooo!!!!
+                    - NOTE EITHER NEED 3 LEVELS OF CHILD PARENT OR DONT DO THE SHIT LIKE POWERLIFT CHEST BARBELL, MIGHT BE POSSIBLE AS IS TBF BUT IS CONFUSING THO
 
 - some basic "modifier" logic before 1st big refactor
     - remember need this functionality to be good as will be adding my own modifiers which allow for like heavy long rest or short explosive/lighter etc is important tho 
@@ -56,7 +57,8 @@ do simple running metric
 should include datetime of session btw
 make session id an int 
 add new session id for actual id style id (use uuid?)
-
+THIS FUCKING QUERY FUCK ME
+SELECT C.exName, P.exName FROM chest_two C JOIN chest_two P ON C.exID = P.exParent WHERE C.mainEquip = "Barbell"
 
 IMPORTANT
 - tapping prev total weight (or any selector ig) while timer is going will just end the timer, need a fix for this!

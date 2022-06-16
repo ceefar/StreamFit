@@ -11,6 +11,7 @@ from PIL import Image
 # integrations for db access, workout calculations 
 import integration_database as fitdb
 import integration_workout as wocalc
+import screenshotter as sss #selenium screenshotter
 
 # ---- functions ----
 
@@ -127,6 +128,20 @@ def get_weight_comparision(weight:int) -> tuple[str,float,str]:
     print(f"{compare_tuple = }")
     return(compare_tuple)
 
+@st.cache
+def get_equipexercises_parent(equip):
+    childparentequipexercises = fitdb.get_equipexercises_with_childparent(equip)
+    return(childparentequipexercises)
+
+def get_equipexercises_basic(equiplist):
+    return(fitdb.get_equipexercises_forlist_basic(equiplist))
+
+def get_ss():
+    # what you wanna do here is pass the name or path or link or whatever (the path tbf)
+    # and save it in a session state called "images", so if path is in ss[images] then it can just use it, else it finds it!
+    path_to_ss = sss.take_selenium_screenshot()
+    return(path_to_ss)
+
 # ---- START MAIN EXERCISE PAGE APP ----
 
 def run():
@@ -193,13 +208,49 @@ def run():
         equip_list.append(equip[0])
     equip_tuple = tuple(equip_list)
 
-    equip_select = st.radio(
-     "Choose Equipment",
-     equip_tuple)
+    
 
-    st.write(f"You Selected {equip_select}")
-    #st.write(f"You Selected", equip_select)
+    #equip_select = st.radio("Choose Equipment", equip_tuple)+
+    #equip_select = st.selectbox(
+    # 'Choose Equipment',equip_tuple)
+     #parented_exercises = get_equipexercises_parent(equip_select)
+
+    equip_select = st.multiselect(
+     'Choose Equipment',
+     equip_tuple,
+     ['Barbell'])
+
+    
+    just_exercises_list = []
+    exercise_equipment = get_equipexercises_basic(equip_select)
+    for exercise in exercise_equipment:
+        parent, child, equip = exercise[0], exercise[1], exercise[2]
+        if child:
+            just_exercises_list.append(f"{child} -> {parent} [{equip}]")
+
+        else:
+            just_exercises_list.append(f"{parent} [{equip}]")    
+        
+    current_equipex_name = st.selectbox("Choose An Exercise", just_exercises_list)
+    
+    with st.expander(f"Quick Preview -> {current_equipex_name}"):
+        # FIXME :
+        # obvs the above session state thing, also need new function for getting link from name (will have to format the link too)
+        # clarify to user app faster once more images loaded, maybe through a success box or similar (alert if they have)
+        # also maybe not an expander (idk tho) as nice to have a way to just run that code when its needed, not at start (would cache do that?)
+        # also also make a funct to say do the most popular ones and defo the ones that it will start on for each loading page
+        # and have them preload at the start of the app
+        # obvs could legit make a funct that goes through all links and saves them for me too / the user
+        # to save time, do that and make it optional but dont use all images throughout as want to see any errors or potential sticking points
+        img_path = get_ss()
+        st.image(img_path)
+
     st.write("##")
+
+
+    
+   
+
 
     if info[2]:
         st.markdown(f"##### [ 1 ] - {muscle_justname} - ")

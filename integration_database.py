@@ -162,6 +162,48 @@ def get_all_equip_for_mg(mg):
     return(equip_tuple)
 
 
+def get_equipexercises_with_childparent(equip):
+    mg = 'chest'
+    get_equip_exercises_query = f"SELECT C.exName, P.exName FROM chest_two C JOIN {mg}_two P ON C.exID = P.exParent WHERE C.mainEquip = '{equip}'"
+    get_equip_exercises = get_from_db(get_equip_exercises_query)
+    print(get_equip_exercises)
+    return(get_equip_exercises)
+
+
+def get_equipexercises_basic(equip):
+    get_equipexs_query = f"SELECT exName, exParent FROM chest_main WHERE mainEquip = '{equip}'"
+    equipexs = get_from_db(get_equipexs_query)
+    print(f"{equipexs = }")
+    print(f"{equipexs[0] = }")
+    return(equipexs)
+    
+def get_equipexercises_forlist_basic(equiplist):
+    
+    print(f"{equiplist = }")
+    
+    #FIXME: ORDER BY EQUIPMENT!
+
+    if len(equiplist) == 1:
+        get_equipexs_query = f"SELECT exName, exParent, mainEquip, exLink FROM chest_main WHERE mainEquip = '{equiplist[0]}'"
+    elif len(equiplist) == 2:
+        get_equipexs_query = f"SELECT exName, exParent, mainEquip, exLink FROM chest_main WHERE mainEquip = '{equiplist[0]}' OR mainEquip = '{equiplist[1]}'"
+    elif len(equiplist) == 3:
+        get_equipexs_query = f"SELECT exName, exParent, mainEquip, exLink FROM chest_main WHERE mainEquip = '{equiplist[0]}' OR mainEquip = '{equiplist[1]}' OR mainEquip = '{equiplist[2]}'"
+    elif len(equiplist) == 4:
+        get_equipexs_query = f"SELECT exName, exParent, mainEquip, exLink FROM chest_main WHERE mainEquip = '{equiplist[0]}' OR mainEquip = '{equiplist[1]}' OR mainEquip = '{equiplist[2]}' OR mainEquip = '{equiplist[3]}'"
+    elif len(equiplist) == 5:
+        get_equipexs_query = f"SELECT exName, exParent, mainEquip, exLink FROM chest_main WHERE mainEquip = '{equiplist[0]}' OR mainEquip = '{equiplist[1]}' OR mainEquip = '{equiplist[2]}' OR mainEquip = '{equiplist[3]}' OR mainEquip = '{equiplist[4]}'"
+    elif len(equiplist) == 6:
+        get_equipexs_query = f"SELECT exName, exParent, mainEquip, exLink FROM chest_main WHERE mainEquip = '{equiplist[0]}' OR mainEquip = '{equiplist[1]}' OR mainEquip = '{equiplist[2]}' OR mainEquip = '{equiplist[3]}' OR mainEquip = '{equiplist[4]}' OR mainEquip = '{equiplist[5]}'"
+
+    equipexs = get_from_db(get_equipexs_query)
+
+    print(f"{equipexs = }")
+    return(equipexs)
+
+
+
+
 
 def create_all_chest_tables():
     """ allows to go through web scrapped data and manually configure tables with ease """
