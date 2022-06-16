@@ -147,6 +147,21 @@ def check_if_usersession_table_exists(user_name:str = "") -> str:
 
 # ---- START EQUIPMENT EXERCISES DB SETUP ----
 
+
+def get_all_equip_for_mg(mg):
+
+    print(f"{mg = }")
+    if mg == "Chest":
+        table_name = "chest_main"
+    
+    get_equip_query = f"SELECT DISTINCT mainEquip FROM {table_name}"
+    equip_tuple = get_from_db(get_equip_query)
+
+    print(f"{equip_tuple = }")
+    print(f"{equip_tuple[0] = }")
+
+
+
 def create_all_chest_tables():
     """ allows to go through web scrapped data and manually configure tables with ease """
     chest_data = fitdb.get_all_exercises_from_mg_chest()
@@ -256,10 +271,10 @@ def get_previous_sessionid_and_return_current(user_name):
 
 def get_last_sessionid_from_current(user_name):
     """ get the previous session id by using the username """
-    get_prev_sessionid_query = f"SELECT sessionid, setnumb FROM {user_name}_sessions ORDER BY sessionid DESC LIMIT 1"
+    get_prev_sessionid_query = f"SELECT sessionid FROM {user_name}_sessions ORDER BY sessionid DESC LIMIT 1"
     prev_sessionid = get_from_db(get_prev_sessionid_query)
     prev_sessionid = prev_sessionid[0][0]
-    prev_sessionid = int(prev_sessionid) - 1
+    prev_sessionid = int(prev_sessionid)
     return(prev_sessionid)
 
 
@@ -277,7 +292,7 @@ def find_previous_sets_for_muscle(user_name:str, sessionName:str, muscleNumb:str
     # print(f"{prevSessionID = }")
     # print(f"{sessionName = }")
     # print(f"{muscleNumb = }")
-    get_previous_set_query = f"SELECT SetNumb, SetReps, SetWeight, SetTotalWeight FROM user_sessions WHERE sessionName = '{sessionName}' AND muscleNumbGroup = '{muscleNumb}' AND sessionid = '{prevSessionID}'"
+    get_previous_set_query = f"SELECT SetNumb, SetReps, SetWeight, SetTotalWeight FROM {user_name}_sessions WHERE sessionName = '{sessionName}' AND muscleNumbGroup = '{muscleNumb}' AND sessionid = '{prevSessionID}'"
     previous_set = get_from_db(get_previous_set_query)
     print(f"{previous_set = }")
     return(previous_set)
@@ -303,8 +318,8 @@ def main():
 
 # driver... vrmmmm
 if __name__=='__main__':
-    create_all_chest_tables()
-    #main()
+    #create_all_chest_tables()
+    main()
 
 # ---- END DRIVER ----
 

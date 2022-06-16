@@ -54,6 +54,11 @@ def convert_seconds_to_minutes(seconds) -> int:
 
 
 @st.cache
+def get_equip_list(muscle):
+    fitdb.get_all_equip_for_mg(muscle)
+
+
+@st.cache
 def update_db(args):
     for i, arg in enumerate(args):
         #print(f"{arg = }")
@@ -181,6 +186,8 @@ def run():
     st.title(f"Exericse 1 : {muscle_justname}")
     st.subheader(f":muscle: {session_name}")
 
+    get_equip_list(muscle_justname)
+
     if info[2]:
         st.markdown(f"##### [ 1 ] - {muscle_justname} - ")
         st.write(f"Modifier : {info[2]}")
@@ -207,6 +214,9 @@ def run():
 
             if amount_of_sets == 3:
 
+                #BUG: IF USER HAS MORE THAN 3 SETS SAVED FOR EXERCISE THIS ERRORS (shouldnt be able to happen technically at this stage but in future will want so it is moderate oof)
+                #BUG: Note may have been unrelated error but still errored tbf so this is clearly a possible sticking point, need LBYL or EAFP
+                
                 psetcol1, psetcol2, psetcol3, psetcol4 = st.columns(4)
 
                 set_1 = previous_set[0]
