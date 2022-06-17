@@ -5,3 +5,4 @@ SIC_ETL_REFERENCE/DashboardUSEME.py
 SIC_ETL_REFERENCE/siic_etl_streamlitUSEME.py
 SIC_ETL_REFERENCE/siic_etl.py
 SIC_ETL_REFERENCE/siic_ceefar.py
+images/*

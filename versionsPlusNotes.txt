@@ -1,0 +1,30 @@
+# use this for commit messages too
+
+v0.3 - ONGOING
+
+Basic Equipment Implementation
+------------------------------
+
+- basic image screenshotter, using seleium for ss and removing popup with xpath, pil for image crop
+    - only one site image tested so far
+- load screenshotted image to site for preview
+    - various considerations for this currently implementing (see below)
+- equip selector and pulling db data
+- db automator backend admin panel super basics but does the job
+- currently implementing sessionState[images] dictionary to store images as basic cache functionality
+- dynamic name creation for image names based on links
+- pulling data from db based on various types of formatted names (kinda long tho should use a dict for displayName and DBusable name or sumnt similar ??)
+- clean loading and cache working basics for chest, both parent only and parent child cases semi tested, is <3
+
+
+
+Would Like This Sprint (i.e. today)
+-----------------------------------
+
+- set the equipment, pull from db more info on it
+
+- from there actually converting from just mg logging stats to equipmentexercise logging stats
+    - (using link name for saving might actually be best since is unique?!)
+
+- preload "most popular" (dummified for now obvs) 
+    - smart thing to do would be obvs just to do it for the 1st exercise so would need to know that before start the load

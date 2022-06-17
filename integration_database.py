@@ -202,7 +202,42 @@ def get_equipexercises_forlist_basic(equiplist):
     return(equipexs)
 
 
-
+def pull_fix_and_return_link_using_names(musclename:str, parents_name:str, equip_name:str, kids_name:str = ""):
+    """ longwinded but easily improved, should consider cases for passing different things not just 3x names - use tuples is better then can check size of tuple if 2, 3, or 4 items """
+    
+    musclename = musclename.lower()
+    
+    if kids_name:
+        print(f"{musclename = }")
+        print(f"{parents_name = }")
+        print(f"{kids_name = }")
+        print(f"{equip_name = }")
+        # WILL NEED A BETTER WAY TO ACCESS OR ATLEAST NAME THE MG TABLES SINCE SENDING VARS AND MAY BE LIKE A SMALLER MG (mg child?) OR JUST HAVE 1 BIG TABLE FOR EACH MG IDK (best for now tbf)
+        pull_link_query = f"SELECT exLink FROM {musclename}_main WHERE exName = '{kids_name}' AND exParent = '{parents_name}' AND mainEquip = '{equip_name}'"
+        partial_exercise_link = get_from_db(pull_link_query)
+        partial_exercise_link = partial_exercise_link[0][0]
+        print(f"{partial_exercise_link = }")
+        # should really use regex to find first char thats not . or / but meh for now
+        trimmed_exercise_link = partial_exercise_link[5:]
+        print(f"{trimmed_exercise_link = }")
+        final_exercise_link = f"https://exrx.net{trimmed_exercise_link}" 
+        print(f"{final_exercise_link = }")
+        return(final_exercise_link)
+    else:
+        print(f"{musclename = }")
+        print(f"{parents_name = }")
+        print(f"{equip_name = }")
+        # WILL NEED A BETTER WAY TO ACCESS OR ATLEAST NAME THE MG TABLES SINCE SENDING VARS AND MAY BE LIKE A SMALLER MG (mg child?) OR JUST HAVE 1 BIG TABLE FOR EACH MG IDK (best for now tbf)
+        pull_link_query = f"SELECT exLink FROM {musclename}_main WHERE exName = '{parents_name}' AND mainEquip = '{equip_name}'"
+        partial_exercise_link = get_from_db(pull_link_query)
+        partial_exercise_link = partial_exercise_link[0][0]
+        print(f"{partial_exercise_link[0][0] = }")
+        # should really use regex to find first char thats not . or / but meh for now
+        trimmed_exercise_link = partial_exercise_link[5:]
+        print(f"{trimmed_exercise_link = }")
+        final_exercise_link = f"https://exrx.net{trimmed_exercise_link}" 
+        print(f"{final_exercise_link = }")
+        return(final_exercise_link)
 
 
 def create_all_chest_tables():

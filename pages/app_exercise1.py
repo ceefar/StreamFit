@@ -116,11 +116,13 @@ def section_previous_set_data(previous_set:tuple) -> tuple:
         set_2 = previous_set[1]
         set_3 = previous_set[2]
     
+
 @st.cache
 def get_rest_time_from_muscle(mg:str, split:str) -> int:
     rest_time = wocalc.calculate_rest_time_v0(mg, split)
     print(f"{rest_time = }")
     return(rest_time)
+
 
 @st.cache
 def get_weight_comparision(weight:int) -> tuple[str,float,str]:
@@ -128,19 +130,72 @@ def get_weight_comparision(weight:int) -> tuple[str,float,str]:
     print(f"{compare_tuple = }")
     return(compare_tuple)
 
+
 @st.cache
 def get_equipexercises_parent(equip):
     childparentequipexercises = fitdb.get_equipexercises_with_childparent(equip)
     return(childparentequipexercises)
 
+
 def get_equipexercises_basic(equiplist):
     return(fitdb.get_equipexercises_forlist_basic(equiplist))
 
-def get_ss():
+
+def get_ss(equip_exercise_name:str, muscle_justname:str):
     # what you wanna do here is pass the name or path or link or whatever (the path tbf)
     # and save it in a session state called "images", so if path is in ss[images] then it can just use it, else it finds it!
-    path_to_ss = sss.take_selenium_screenshot()
+    # have finds link function in here since just makes more sense for flow of session state (i think anyways)
+    
+    exrx_exercise_link = split_current_equipex_name_for_link(equip_exercise_name, muscle_justname)
+
+    ss_index = exrx_exercise_link.rfind("/")
+    ssnamepath = f"images/{exrx_exercise_link[ss_index+1:]}.png" 
+
+    if equip_exercise_name in st.session_state["images"]:
+        print(f"{ssnamepath}")
+        return(ssnamepath)
+    else:
+        # if not in session state (hasn't been screenshotted before and saved to images cache (or just already in images cache))
+        # add it to the images cache dictionary {key->name:value->path}
+        st.session_state["images"][equip_exercise_name] = "images\BBBenchPress.png" 
+        # take the screenshot, should probably flip the order here incase screenshot errors
+        path_to_ss = sss.take_selenium_screenshot(exrx_exercise_link) # needs url to do this properly
     return(path_to_ss)
+
+
+def split_current_equipex_name_for_link(equipex_name:str, muscle_justname:str) -> str:
+    """ self referencing, returns link, should find an easier way to do this tho """
+    # if is a child
+    if "->" in equipex_name:
+        kids_index = equipex_name.find("->")
+        equip_index = equipex_name.find("[")
+        kids_name = equipex_name[kids_index+3:equip_index-1]
+        parents_name = equipex_name[:kids_index]
+        equip_name = equipex_name[equip_index+1:-1]
+        parents_name = parents_name.strip()
+        exercise_link = use_name_get_link(muscle_justname, parents_name, equip_name, kids_name)
+        return(exercise_link)
+    else:
+        # if its a parent (no child)
+        equip_index = equipex_name.find("[")
+        equip_name = equipex_name[equip_index+1:-1]
+        parents_name = equipex_name[:equip_index]
+        parents_name = parents_name.strip()
+        # st.write(f"{parents_name = }")
+        # st.write(f"{equip_name = }")
+        exercise_link = use_name_get_link(muscle_justname, parents_name, equip_name)
+        return(exercise_link)
+    
+    
+def use_name_get_link(musclegroup:str, parents_name:str, equip_name:str, kids_name:str = ""):
+    if kids_name:
+        exrx_link = fitdb.pull_fix_and_return_link_using_names(musclegroup, parents_name, equip_name, kids_name)
+        return(exrx_link)
+    else:
+        exrx_link = fitdb.pull_fix_and_return_link_using_names(musclegroup, parents_name, equip_name)
+        return(exrx_link)
+
+
 
 # ---- START MAIN EXERCISE PAGE APP ----
 
@@ -172,6 +227,9 @@ def run():
 
     if "currentset" not in st.session_state:
         st.session_state["currentset"] = 1
+
+    if "images" not in st.session_state:
+        st.session_state["images"] = {}
 
     # ---- variable declarations ----
 
@@ -232,6 +290,13 @@ def run():
             just_exercises_list.append(f"{parent} [{equip}]")    
         
     current_equipex_name = st.selectbox("Choose An Exercise", just_exercises_list)
+
+    # TRY IMPLEMENT LOADING BAR THING HERE OOO - again full idea is maybe to prompt beforehand and load some 
+    # or have short load on first run/if doesnt find any cached images (its like a short setup basically)
+    
+
+    #split_current_equipex_name_for_link(current_equipex_name)
+            
     
     with st.expander(f"Quick Preview -> {current_equipex_name}"):
         # FIXME :
@@ -240,16 +305,17 @@ def run():
         # also maybe not an expander (idk tho) as nice to have a way to just run that code when its needed, not at start (would cache do that?)
         # also also make a funct to say do the most popular ones and defo the ones that it will start on for each loading page
         # and have them preload at the start of the app
+        # obvs also ig have sumnt to pull image file names listed in that folder (or just a manually made list for now)
+        # then just dont run the funct and instead send the image path if in that list
         # obvs could legit make a funct that goes through all links and saves them for me too / the user
         # to save time, do that and make it optional but dont use all images throughout as want to see any errors or potential sticking points
-        img_path = get_ss()
+        img_path = get_ss(current_equipex_name, muscle_justname)
         st.image(img_path)
 
     st.write("##")
 
 
-    
-   
+
 
 
     if info[2]:
