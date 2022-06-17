@@ -177,6 +177,7 @@ def get_equipexercises_basic(equip):
     print(f"{equipexs[0] = }")
     return(equipexs)
     
+    
 def get_equipexercises_forlist_basic(equiplist):
     
     print(f"{equiplist = }")

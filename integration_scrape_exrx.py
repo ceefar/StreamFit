@@ -188,8 +188,6 @@ def get_all_exercises_from_mg_chest():
     return(ex_plus_links_list)
     
     
-
-
 def program():
     template_dict = {}
 
@@ -213,7 +211,6 @@ def program():
     doc = soup(result.text, "html.parser")
 
     # PRINT THE AMOUNT(count) OF SESSIONS TO CHOOSE FROM
-    print("")
     session_count = []
     session_col_div_classes_counter = doc.find_all('div', {'class': 'col-sm-6'})
     [session_count.append(session) for session in session_col_div_classes_counter]
@@ -252,14 +249,132 @@ def program():
                     print(name)
                     print(link)
 
+
     print("------------------------------------")
     print("")
+
+
+def grab_basic_exercise_info_from_exrx(url:str):
+    """ note also need db version for the other shit that will be metric but for now will grab from the website since its not in the db  """
+    # GET THE URL DATA
+    result = requests.get(url)
+    doc = soup(result.text, "html.parser")
+
+    print("")
+
+    table = doc.find("table")
+
+    a_list = []
+    ex_utility = ""
+    ex_mechanics = ""
+    ex_force = ""
+    for a in table.find_all('a', href=True):
+        a_list.append(str(a))
+    for i, a in enumerate(a_list):
+        a = a[:-4]
+        firstindex = a.rfind(">")
+        a = a[firstindex+1:]
+
+        if i == 0:
+            ex_utility = a 
+        elif i == 1:
+            ex_mechanics = a
+        elif i == 2:
+            ex_force = a 
+
+    print(f"{ex_utility = }")
+    print(f"{ex_mechanics = }")
+    print(f"{ex_force = }")
+
+    ex_prep = ""
+    for dastring in doc.find_all("strong", text="Preparation"):
+        para = dastring.find_next('p')
+        ex_prep = para.contents[0]
+        print(f"{ex_prep = }")
+
+    ex_exec = ""
+    for dastring in doc.find_all("strong", text="Execution"):
+        para = dastring.find_next('p')
+        ex_exec = para.contents[0]
+        print(f"{ex_exec = }")
+
+    # might not exist btw, have no idea for sure but is the obvious assumption    
+    ex_comments = ""
+    for dastring in doc.find_all("h2", text="Comments"):
+        para = dastring.find_next('p')
+        extrapara = dastring.find_next('a')
+        ex_comments = para.contents[0]
+        ex_comments += extrapara.contents[0]
+        print(f"{ex_comments = }")
+
+    # legit only grabs one but thats fine for now
+    # also might not exist btw, even more likely, tbf also could just grab text and presave the links (in a db table ooooo)
+    ex_alsosee = ""
+    for dastring in doc.find_all("p", text="Also see:"):
+        para = dastring.find_next('a') # USE LI TO GET THE LINK TOO BUT NOT FORMATTED
+        ex_alsosee = para.contents[0]
+        print(f"{ex_alsosee = }") # https://exrx.net/Kinesiology/BenchPress
+
+    ex_target = ""
+    for dastring in doc.find_all("strong", text="Target"):
+        para = dastring.find_next('a')
+        ex_target = para.contents[0]
+        print(f"{ex_target = }")
+    
+    temp_synergists = []
+    ex_synergists = []
+    for dastring in doc.find_all("strong", text="Synergists"):
+        para = dastring.find_next('ul')
+        temp_synergists = para.contents
+        for listi in temp_synergists:
+            if listi == "\n":
+                continue
+            else:
+                synerg = str(listi)[:-9]
+                lastslash = synerg.rfind(">")
+                synerg = synerg[lastslash+1:]
+                ex_synergists.append(synerg)
+    print(f"{ex_synergists = }")
+
+    temp_stabalisers = []
+    ex_stabalisers = []
+    for dastring in doc.find_all("strong", text="Dynamic Stabilizers"):
+        para = dastring.find_next('ul')
+        temp_stabalisers = para.contents
+        for listi in temp_stabalisers:
+            if listi == "\n":
+                continue
+            else:
+                stabali = str(listi)[:-9]
+                lastslash = stabali.rfind(">")
+                stabali = stabali[lastslash+1:]
+                ex_stabalisers.append(stabali)
+    print(f"{ex_stabalisers = }")
+
+    final_list = [ex_utility, ex_mechanics, ex_force, ex_prep, ex_exec, ex_comments, ex_alsosee, ex_target, ex_synergists, ex_stabalisers]
+
+    return(final_list)
+   
+
+    # SHOULD PROPOGATE THE TABLE EACH TIME THIS RUNS - OBVS CHECKING IF IS IN THEIR FIRST, IF ISNT FILLERUP
+
+    # DONT BE A DOUCHE, SEPARATE FUNCTIONS! BRUH... BE PYTHONIC
+    # NOTE - TO RESOLVE ANY POSSIBLE ERRORS HAVE A LIST OF POSSIBLE STRINGS THINGS CAN BE AND CHECK AGAINST THAT BOSH! (tho saying that if they were like 1 char off i would care less but meh its a consideration anyway)
+
+        
+
+
+    
+
+
+
 
 
 # driver... vrmmmm
 if __name__=='__main__':
     #program() 
-    get_all_exercises_from_mg_chest()
+    pass
+    #get_all_exercises_from_mg_chest()
 
 
 # THEN ON TO STREAMLIT AND IMPLEMENT IMAGES AND SIMPLE TRACKING OOOOO

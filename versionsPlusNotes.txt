@@ -22,7 +22,11 @@ Would Like This Sprint (i.e. today)
 -----------------------------------
 
 - set the equipment, pull from db more info on it
-    - ideally hiding rest of the display or making it not active to use anything else until is valid to do so (hide probably easier and better tho btw)
+    - start with an expander of exercise info pulled dynamically from webpage!
+    - with metrics of compound etc (which are in db tbf so load them first!)
+    - again use a prog bar or spinner here (prog bar nice to learn?) 
+    [DONE]
+    - [DONE] ideally hiding rest of the display or making it not active to use anything else until is valid to do so (hide probably easier and better tho btw)
 
 - from there actually converting from just mg logging stats to equipmentexercise logging stats
     - (using link name for saving might actually be best since is unique?!)

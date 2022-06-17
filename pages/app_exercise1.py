@@ -11,6 +11,7 @@ from PIL import Image
 # integrations for db access, workout calculations 
 import integration_database as fitdb
 import integration_workout as wocalc
+import integration_scrape_exrx as exrx
 import screenshotter as sss #selenium screenshotter
 
 # ---- functions ----
@@ -255,7 +256,6 @@ def run():
     #print(f"{session_name = }")
     #print(f"{current_session = }") 
 
-
     # ---- PAGE START ----
 
     # note has to be almost one of the first things you do right, so just get a basic for now on new branch anyway so chill
@@ -263,13 +263,13 @@ def run():
     st.title(f"Exericse 1 : {muscle_justname}")
     st.subheader(f":muscle: {session_name}")
 
+    st.write("##")
+
     temp_equip = get_equip_list(muscle_justname)
     equip_list = []
     for equip in temp_equip:
         equip_list.append(equip[0])
     equip_tuple = tuple(equip_list)
-
-    
 
     #equip_select = st.radio("Choose Equipment", equip_tuple)+
     #equip_select = st.selectbox(
@@ -294,6 +294,8 @@ def run():
         
         
     current_equipex_name = st.selectbox("Choose An Exercise", just_exercises_list)
+
+    st.write("##")
 
     # TRY IMPLEMENT LOADING BAR THING HERE OOO - again full idea is maybe to prompt beforehand and load some 
     # or have short load on first run/if doesnt find any cached images (its like a short setup basically)
@@ -322,12 +324,58 @@ def run():
 
     st.write("##")
 
+    with st.expander("Exname Info"):
+        exrx_exercise_link = split_current_equipex_name_for_link(current_equipex_name, muscle_justname)
+        
+        # obvs move to proper function place above page stuff
+        exercise_info_list = exrx.grab_basic_exercise_info_from_exrx(exrx_exercise_link)
+
+        st.write("##")
+
+        ex_utility, ex_mechanics, ex_force, ex_prep, ex_exec, ex_comments, ex_alsosee, ex_target, ex_synergists, ex_stabalisers = exercise_info_list
+        exinfocol1, exinfocol2, exinfocol3 = st.columns(3)
+        exinfocol1.write(f"UTILITY : **{ex_utility}**")
+        exinfocol2.write(f"MECHANICS : **{ex_mechanics}**") #FIXME: add icons here? test it to get working for elsewhere anyways https://autobencoder.com/2022-03-10-streamlit-fontawesome/
+        exinfocol3.write(f"FORCE : **{ex_force}**")
+        st.write("##")
+
+        ## HAD CLEAN CCS HERE TO CENTRE TEXT BUT MEH - NEED TO FIGURE OUT SPECIFICS OR MSG ABOUT HOW TO HAVE MULTIPLE OR WHATEVER
+
+        with st.container(): # .css-znku1x p and margin:0px prior to this
+            prep_style = f"""**EXERCISE PREPARATION**
+                    <style>
+                        .css-1valv9w
+                        {{
+                        gap: 0px;
+                        }}
+                    </style>
+                    """
+            st.markdown(prep_style, unsafe_allow_html=True)
+
+            st.write(ex_prep)
+
+            st.write("##")
+            st.write("**EXERCISE EXECUTION**")
+            st.write(ex_exec)
+            st.write("##")
+            infoimgcol1, infoimgcol2 = st.columns([1,2])
+            infoimgcol1.write("##")
+            infoimgcol1.write("**TARGET MUSCLE**") # probably look better in a table or sumnt whatever is fine as is
+            infoimgcol1.write(ex_target)
+            infoimgcol1.write("**STABALISERS**")
+            infoimgcol1.write(ex_stabalisers[0])
+            infoimgcol2.image(img_path)
+        st.write("##")
+        st.write(exercise_info_list)
+
 
     # CONTAINER FOR EVERYTHING BEFORE SELECTING EQUIPMENT!
     # not considered changing equipment cases yet until this is working fine
     with st.container():
 
         if has_chosen_equipmentexercise:
+
+            #current equip ex name to find shit here, only need to use link DUHHHHH!
 
             if info[2]:
                 st.markdown(f"##### [ 1 ] - {muscle_justname} - ")
@@ -347,7 +395,6 @@ def run():
             # ---- PREVIOUS SETS COMPARISON EXPANDER [ALPHA] ----
             with st.expander(f"Previous Stats For {muscle_justname}"):
                     
-
                 previous_set = grab_previous_set_data(active_user, session_name, muscle_justname)
                 amount_of_sets = len(previous_set)
                 
