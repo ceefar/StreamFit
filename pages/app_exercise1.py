@@ -155,11 +155,14 @@ def get_ss(equip_exercise_name:str, muscle_justname:str):
         print(f"{ssnamepath}")
         return(ssnamepath)
     else:
-        # if not in session state (hasn't been screenshotted before and saved to images cache (or just already in images cache))
-        # add it to the images cache dictionary {key->name:value->path}
-        st.session_state["images"][equip_exercise_name] = "images\BBBenchPress.png" 
-        # take the screenshot, should probably flip the order here incase screenshot errors
-        path_to_ss = sss.take_selenium_screenshot(exrx_exercise_link) # needs url to do this properly
+        with st.spinner('Grabbing Exercise Data...'):
+        
+            # if not in session state (hasn't been screenshotted before and saved to images cache (or just already in images cache))
+            # add it to the images cache dictionary {key->name:value->path}
+            st.session_state["images"][equip_exercise_name] = "images\BBBenchPress.png" 
+            # take the screenshot, should probably flip the order here incase screenshot errors
+            path_to_ss = sss.take_selenium_screenshot(exrx_exercise_link) # needs url to do this properly
+        st.success('Done & Saved To Cache!')
     return(path_to_ss)
 
 
@@ -289,6 +292,7 @@ def run():
         else:
             just_exercises_list.append(f"{parent} [{equip}]")    
         
+        
     current_equipex_name = st.selectbox("Choose An Exercise", just_exercises_list)
 
     # TRY IMPLEMENT LOADING BAR THING HERE OOO - again full idea is maybe to prompt beforehand and load some 
@@ -298,7 +302,7 @@ def run():
     #split_current_equipex_name_for_link(current_equipex_name)
             
     
-    with st.expander(f"Quick Preview -> {current_equipex_name}"):
+    with st.expander(f"Quick Preview -> {current_equipex_name}", True):
         # FIXME :
         # obvs the above session state thing, also need new function for getting link from name (will have to format the link too)
         # clarify to user app faster once more images loaded, maybe through a success box or similar (alert if they have)
@@ -314,269 +318,277 @@ def run():
 
     st.write("##")
 
+    has_chosen_equipmentexercise = st.button('CHOOSE THIS EXERCISE')
+
+    st.write("##")
+
+
+    # CONTAINER FOR EVERYTHING BEFORE SELECTING EQUIPMENT!
+    # not considered changing equipment cases yet until this is working fine
+    with st.container():
+
+        if has_chosen_equipmentexercise:
+
+            if info[2]:
+                st.markdown(f"##### [ 1 ] - {muscle_justname} - ")
+                st.write(f"Modifier : {info[2]}")
+                get_image_for_muscle_group(muscle_justname)
+                st.write("##")
+
+            elif info[2] == None:
+                st.markdown(f"##### [ 1 ] - {muscle_justname}")
+                st.write("Modifier : Nope")
+                get_image_for_muscle_group(muscle_justname)
+                st.write("##")
 
 
 
+            # need some basic validation for if actually has stats (since may not, and much more likely once equipment), would still like some dummy/cute data or even explainer in its place
+            # ---- PREVIOUS SETS COMPARISON EXPANDER [ALPHA] ----
+            with st.expander(f"Previous Stats For {muscle_justname}"):
+                    
 
-    if info[2]:
-        st.markdown(f"##### [ 1 ] - {muscle_justname} - ")
-        st.write(f"Modifier : {info[2]}")
-        get_image_for_muscle_group(muscle_justname)
-        st.write("##")
+                previous_set = grab_previous_set_data(active_user, session_name, muscle_justname)
+                amount_of_sets = len(previous_set)
+                
+                if previous_set:
 
-    elif info[2] == None:
-        st.markdown(f"##### [ 1 ] - {muscle_justname}")
-        st.write("Modifier : Nope")
-        get_image_for_muscle_group(muscle_justname)
-        st.write("##")
+                    if amount_of_sets == 3:
 
+                        #BUG: IF USER HAS MORE THAN 3 SETS SAVED FOR EXERCISE THIS ERRORS (shouldnt be able to happen technically at this stage but in future will want so it is moderate oof)
+                        #BUG: Note may have been unrelated error but still errored tbf so this is clearly a possible sticking point, need LBYL or EAFP
 
+                        psetcol1, psetcol2, psetcol3, psetcol4 = st.columns(4)
 
-    # need some basic validation for if actually has stats (since may not, and much more likely once equipment), would still like some dummy/cute data or even explainer in its place
-    # ---- PREVIOUS SETS COMPARISON EXPANDER [ALPHA] ----
-    with st.expander(f"Previous Stats For {muscle_justname}"):
-            
+                        set_1 = previous_set[0]
+                        set_2 = previous_set[1]
+                        set_3 = previous_set[2]
 
-        previous_set = grab_previous_set_data(active_user, session_name, muscle_justname)
-        amount_of_sets = len(previous_set)
-        
-        if previous_set:
+                        set_1_reps, set_1_weight, set_1_total_weight = set_1[1], set_1[2], set_1[3]
+                        set_2_reps, set_2_weight, set_2_total_weight = set_2[1], set_2[2], set_2[3]
+                        set_3_reps, set_3_weight, set_3_total_weight = set_3[1], set_3[2], set_3[3]
 
-            if amount_of_sets == 3:
+                        set_1_weight = float(set_1_weight)
+                        set_1_total_weight = float(set_1_total_weight)
 
-                #BUG: IF USER HAS MORE THAN 3 SETS SAVED FOR EXERCISE THIS ERRORS (shouldnt be able to happen technically at this stage but in future will want so it is moderate oof)
-                #BUG: Note may have been unrelated error but still errored tbf so this is clearly a possible sticking point, need LBYL or EAFP
+                        set_2_weight = float(set_2_weight)
+                        set_2_total_weight = float(set_2_total_weight)
 
-                psetcol1, psetcol2, psetcol3, psetcol4 = st.columns(4)
+                        set_3_weight = float(set_3_weight)
+                        set_3_total_weight = float(set_3_total_weight)
 
-                set_1 = previous_set[0]
-                set_2 = previous_set[1]
-                set_3 = previous_set[2]
+                    with psetcol4:
+                        want_prev_weight = st.checkbox('Previous Weight', True)
+                        want_prev_reps = st.checkbox('Previous Reps', False)
+                        if st.session_state["currentset"] > 1:
+                            want_prev_totweight = st.checkbox('Prev Total Weight', False)     
 
-                set_1_reps, set_1_weight, set_1_total_weight = set_1[1], set_1[2], set_1[3]
-                set_2_reps, set_2_weight, set_2_total_weight = set_2[1], set_2[2], set_2[3]
-                set_3_reps, set_3_weight, set_3_total_weight = set_3[1], set_3[2], set_3[3]
+                #FIXME: Errors here if it doesn't find the pre-existing data, should be an easy enough fix tbf
+                # should note to user that increase weight is always best more clearly
+                # possibly a toggle for show weight reps or total weight in col4? - defo test this tbf
+                
+                    with psetcol1:
+                        st.write("##### Set 1")
+                        set1_reps_delta = st.session_state["exset1reps"] - set_1_reps
+                        set1_weight_delta = st.session_state["exset1"] - set_1_weight
+                        # exsetX stores the weight, defaults to false hence why use greater than 1 (i.e. any weight and not false turns it on)
+                        if st.session_state["exset1"] > 1:
+                            if want_prev_weight:
+                                st.metric(label="Previous Weight", value=f"{set_1_weight} KG", delta=f"{set1_weight_delta} KG today")
+                            if want_prev_reps:
+                                st.metric(label="Previous Reps", value=f"{set_1_reps} reps", delta=f"{set1_reps_delta} reps today")
+                        else:
+                            if want_prev_weight:
+                                st.metric(label="Previous Weight", value=f"{set_1_weight} KG")
+                            if want_prev_reps:
+                                st.metric(label="Previous Reps", value=f"{set_1_reps} reps")
 
-                set_1_weight = float(set_1_weight)
-                set_1_total_weight = float(set_1_total_weight)
+                        if st.session_state["currentset"] > 1:
+                            if want_prev_totweight:
+                                set1_current_session_tot_weight = st.session_state["exset1"] * st.session_state["exset1reps"]
+                                set1_tot_weight_delta = set1_current_session_tot_weight - set_1_total_weight
+                                st.metric(label="Previ Total Weight", value=f"{set_1_total_weight} reps", delta=f"{set1_tot_weight_delta} kg lifted today")
 
-                set_2_weight = float(set_2_weight)
-                set_2_total_weight = float(set_2_total_weight)
+                    with psetcol2:
+                        st.write("##### Set 2")
+                        set2_reps_delta = st.session_state["exset2reps"] - set_2_reps
+                        set2_weight_delta = st.session_state["exset2"] - set_2_weight
 
-                set_3_weight = float(set_3_weight)
-                set_3_total_weight = float(set_3_total_weight)
+                        if st.session_state["exset2"] > 1:
+                            if want_prev_weight:
+                                st.metric(label="Previous Weight", value=f"{set_2_weight} KG", delta=f"{set2_weight_delta} KG today")
+                            if want_prev_reps:
+                                st.metric(label="Previous Reps", value=f"{set_2_reps} reps", delta=f"{set2_reps_delta} reps today")
+                        else:
+                            if want_prev_weight:
+                                st.metric(label="Previous Weight", value=f"{set_2_weight} KG")
+                            if want_prev_reps:
+                                st.metric(label="Previous Reps", value=f"{set_2_reps} reps")
 
-            with psetcol4:
-                want_prev_weight = st.checkbox('Previous Weight', True)
-                want_prev_reps = st.checkbox('Previous Reps', False)
-                if st.session_state["currentset"] > 1:
-                    want_prev_totweight = st.checkbox('Prev Total Weight', False)     
+                        if st.session_state["currentset"] > 2:
+                            if want_prev_totweight:
+                                set2_current_session_tot_weight = st.session_state["exset2"] * st.session_state["exset2reps"]
+                                set2_tot_weight_delta = set2_current_session_tot_weight - set_2_total_weight
+                                st.metric(label="Previ Total Weight", value=f"{set_2_total_weight} reps", delta=f"{set2_tot_weight_delta} kg lifted today")
 
-        #FIXME: Errors here if it doesn't find the pre-existing data, should be an easy enough fix tbf
-        # should note to user that increase weight is always best more clearly
-        # possibly a toggle for show weight reps or total weight in col4? - defo test this tbf
-        
-            with psetcol1:
-                st.write("##### Set 1")
-                set1_reps_delta = st.session_state["exset1reps"] - set_1_reps
-                set1_weight_delta = st.session_state["exset1"] - set_1_weight
-                # exsetX stores the weight, defaults to false hence why use greater than 1 (i.e. any weight and not false turns it on)
-                if st.session_state["exset1"] > 1:
-                    if want_prev_weight:
-                        st.metric(label="Previous Weight", value=f"{set_1_weight} KG", delta=f"{set1_weight_delta} KG today")
-                    if want_prev_reps:
-                        st.metric(label="Previous Reps", value=f"{set_1_reps} reps", delta=f"{set1_reps_delta} reps today")
+                    with psetcol3:
+                        st.write("##### Set 3")
+                        set3_reps_delta = st.session_state["exset3reps"] - set_3_reps
+                        set3_weight_delta = st.session_state["exset3"] - set_3_weight
+
+                        if st.session_state["exset3"] > 1:
+                            if want_prev_weight:
+                                st.metric(label="Previous Weight", value=f"{set_3_weight} KG", delta=f"{set3_weight_delta} KG today")
+                            if want_prev_reps:
+                                st.metric(label="Previous Reps", value=f"{set_3_reps} reps", delta=f"{set3_reps_delta} reps today")
+                        else:
+                            if want_prev_weight:
+                                st.metric(label="Previous Weight", value=f"{set_3_weight} KG")
+                            if want_prev_reps:
+                                st.metric(label="Previous Reps", value=f"{set_3_reps} reps")
+
+                        if st.session_state["currentset"] > 3:
+                            if want_prev_totweight:
+                                set3_current_session_tot_weight = st.session_state["exset3"] * st.session_state["exset3reps"]
+                                set3_tot_weight_delta = set3_current_session_tot_weight - set_3_total_weight
+                                st.metric(label="Prev Total Weight", value=f"{set_3_total_weight} reps", delta=f"{set3_tot_weight_delta} kg lifted today")    
+                
                 else:
-                    if want_prev_weight:
-                        st.metric(label="Previous Weight", value=f"{set_1_weight} KG")
-                    if want_prev_reps:
-                        st.metric(label="Previous Reps", value=f"{set_1_reps} reps")
+                    st.write("##### No Previous Set Info")
 
-                if st.session_state["currentset"] > 1:
-                    if want_prev_totweight:
-                        set1_current_session_tot_weight = st.session_state["exset1"] * st.session_state["exset1reps"]
-                        set1_tot_weight_delta = set1_current_session_tot_weight - set_1_total_weight
-                        st.metric(label="Previ Total Weight", value=f"{set_1_total_weight} reps", delta=f"{set1_tot_weight_delta} kg lifted today")
 
-            with psetcol2:
-                st.write("##### Set 2")
-                set2_reps_delta = st.session_state["exset2reps"] - set_2_reps
-                set2_weight_delta = st.session_state["exset2"] - set_2_weight
-
-                if st.session_state["exset2"] > 1:
-                    if want_prev_weight:
-                        st.metric(label="Previous Weight", value=f"{set_2_weight} KG", delta=f"{set2_weight_delta} KG today")
-                    if want_prev_reps:
-                        st.metric(label="Previous Reps", value=f"{set_2_reps} reps", delta=f"{set2_reps_delta} reps today")
+            # ---- CURRENT SETS TRACKER EXPANDER ----
+            with st.expander("Sets For Exercise", True):
+                setcol1, setcol2, setcol3, setcol4 = st.columns(4)
+                
+                if (st.session_state["currentset"]) < 4:
+                    setcol4.write("Current Set")
+                    setcol4.write(st.session_state["currentset"])
                 else:
-                    if want_prev_weight:
-                        st.metric(label="Previous Weight", value=f"{set_2_weight} KG")
-                    if want_prev_reps:
-                        st.metric(label="Previous Reps", value=f"{set_2_reps} reps")
-
-                if st.session_state["currentset"] > 2:
-                    if want_prev_totweight:
-                        set2_current_session_tot_weight = st.session_state["exset2"] * st.session_state["exset2reps"]
-                        set2_tot_weight_delta = set2_current_session_tot_weight - set_2_total_weight
-                        st.metric(label="Previ Total Weight", value=f"{set_2_total_weight} reps", delta=f"{set2_tot_weight_delta} kg lifted today")
-
-            with psetcol3:
-                st.write("##### Set 3")
-                set3_reps_delta = st.session_state["exset3reps"] - set_3_reps
-                set3_weight_delta = st.session_state["exset3"] - set_3_weight
-
-                if st.session_state["exset3"] > 1:
-                    if want_prev_weight:
-                        st.metric(label="Previous Weight", value=f"{set_3_weight} KG", delta=f"{set3_weight_delta} KG today")
-                    if want_prev_reps:
-                        st.metric(label="Previous Reps", value=f"{set_3_reps} reps", delta=f"{set3_reps_delta} reps today")
+                    setcol4.markdown("""### COMPLETE """)
+                
+                if st.session_state["exset1reps"] < 1:
+                    setcol1.write(":x:")
+                elif st.session_state["exset1reps"] > 1:
+                    set1_reps = st.session_state["exset1reps"]
+                    setcol1.write(f"{set1_reps} reps :white_check_mark:")
                 else:
-                    if want_prev_weight:
-                        st.metric(label="Previous Weight", value=f"{set_3_weight} KG")
-                    if want_prev_reps:
-                        st.metric(label="Previous Reps", value=f"{set_3_reps} reps")
+                    setcol1.write(":white_check_mark:")
 
-                if st.session_state["currentset"] > 3:
-                    if want_prev_totweight:
-                        set3_current_session_tot_weight = st.session_state["exset3"] * st.session_state["exset3reps"]
-                        set3_tot_weight_delta = set3_current_session_tot_weight - set_3_total_weight
-                        st.metric(label="Prev Total Weight", value=f"{set_3_total_weight} reps", delta=f"{set3_tot_weight_delta} kg lifted today")    
-        
-        else:
-            st.write("##### No Previous Set Info")
+                if st.session_state["exset2reps"] < 1:
+                    setcol2.write(":x:")
+                elif st.session_state["exset2reps"] > 1:
+                    set2_reps = st.session_state["exset2reps"]
+                    setcol2.write(f"{set2_reps} reps :white_check_mark:")
+                else:
+                    setcol2.write(":white_check_mark:")
 
-
-    # ---- CURRENT SETS TRACKER EXPANDER ----
-    with st.expander("Sets For Exercise", True):
-        setcol1, setcol2, setcol3, setcol4 = st.columns(4)
-        
-        if (st.session_state["currentset"]) < 4:
-            setcol4.write("Current Set")
-            setcol4.write(st.session_state["currentset"])
-        else:
-            setcol4.markdown("""### COMPLETE """)
-        
-        if st.session_state["exset1reps"] < 1:
-            setcol1.write(":x:")
-        elif st.session_state["exset1reps"] > 1:
-            set1_reps = st.session_state["exset1reps"]
-            setcol1.write(f"{set1_reps} reps :white_check_mark:")
-        else:
-            setcol1.write(":white_check_mark:")
-
-        if st.session_state["exset2reps"] < 1:
-            setcol2.write(":x:")
-        elif st.session_state["exset2reps"] > 1:
-            set2_reps = st.session_state["exset2reps"]
-            setcol2.write(f"{set2_reps} reps :white_check_mark:")
-        else:
-            setcol2.write(":white_check_mark:")
-
-        if st.session_state["exset3reps"] < 1:
-            setcol3.write(":x:")
-        elif st.session_state["exset3reps"] > 1:
-            set3_reps = st.session_state["exset3reps"]
-            setcol3.write(f"{set3_reps} reps :white_check_mark:")
-        else:
-            setcol3.write(":white_check_mark:")
+                if st.session_state["exset3reps"] < 1:
+                    setcol3.write(":x:")
+                elif st.session_state["exset3reps"] > 1:
+                    set3_reps = st.session_state["exset3reps"]
+                    setcol3.write(f"{set3_reps} reps :white_check_mark:")
+                else:
+                    setcol3.write(":white_check_mark:")
 
 
-    # ---- EXERCISE LOGGGER FORM ----
-    ## if 4th set hide form, else show 
-    if (st.session_state["currentset"]) < 4:
-        with st.form(key=f"exercise_logger_1"):
+            # ---- EXERCISE LOGGGER FORM ----
+            ## if 4th set hide form, else show 
+            if (st.session_state["currentset"]) < 4:
+                with st.form(key=f"exercise_logger_1"):
 
-            logcol1, logcol2, logcol3 = st.columns([3,2,1])
+                    logcol1, logcol2, logcol3 = st.columns([3,2,1])
 
-            # SETS DICKHEAD - OR DOES IT GO FOR EVERY SET????
+                    # SETS DICKHEAD - OR DOES IT GO FOR EVERY SET????
 
-            with logcol1:
-                the_reps = st.number_input("Enter Reps Completed", step=1, key="the_reps")
+                    with logcol1:
+                        the_reps = st.number_input("Enter Reps Completed", step=1, key="the_reps")
 
-            with logcol2:
-                # obvs make a toggle for changing weight units - has considerations obvs 
-                the_weight = st.number_input("Enter Weight Used In KG", 5.0, 500.0, step=0.5, key="the_weight")
+                    with logcol2:
+                        # obvs make a toggle for changing weight units - has considerations obvs 
+                        the_weight = st.number_input("Enter Weight Used In KG", 5.0, 500.0, step=0.5, key="the_weight")
 
-            
-            with logcol3:
-                st.write("Start Timer")
-                # logic here for what set!
-                #submit_exercise_log = st.form_submit_button(label="Set Done", on_click=update_db, args=[(active_user, "001", session_name, f"1.{muscle_justname}", current_set, the_reps, the_weight, the_reps*the_weight, exercise_rest_time)])
-                submit_exercise_log = st.form_submit_button(label="Set Done")
+                    
+                    with logcol3:
+                        st.write("Start Timer")
+                        # logic here for what set!
+                        #submit_exercise_log = st.form_submit_button(label="Set Done", on_click=update_db, args=[(active_user, "001", session_name, f"1.{muscle_justname}", current_set, the_reps, the_weight, the_reps*the_weight, exercise_rest_time)])
+                        submit_exercise_log = st.form_submit_button(label="Set Done")
 
 
-            # ---- SUBMIT EXERCISE FORM LOGIC ----
-            if submit_exercise_log:
+                    # ---- SUBMIT EXERCISE FORM LOGIC ----
+                    if submit_exercise_log:
 
-                update_db((active_user, "001", session_name, f"1.{muscle_justname}", current_set, the_reps, the_weight, the_reps*the_weight, exercise_rest_time))
+                        update_db((active_user, "001", session_name, f"1.{muscle_justname}", current_set, the_reps, the_weight, the_reps*the_weight, exercise_rest_time))
 
-                coltime, colres = st.columns([2,2])
-                with colres:
-                    with st.expander("Results"):
-                        weight_lifted = [the_reps*the_weight]
-                        if current_set == 1:
-                            st.session_state["exset1reps"] = the_reps
-                            df = pd.DataFrame({"set1":weight_lifted})
-                        elif current_set == 2:
-                            st.session_state["exset2reps"] = the_reps
-                            set1totweight = st.session_state["exset1reps"] * st.session_state["exset1"]
-                            df = pd.DataFrame({"set1":set1totweight,"set2":weight_lifted})
-                        elif current_set == 3:
-                            st.session_state["exset3reps"] = the_reps
-                            set1totweight = st.session_state["exset1reps"] * st.session_state["exset1"]
-                            set2totweight = st.session_state["exset2reps"] * st.session_state["exset2"]
-                            df = pd.DataFrame({"set1":set1totweight,"set2":set2totweight,"set3":weight_lifted})
-                        st.dataframe(df.T)
-                with coltime:
-                    with st.expander("Timer", True):
-                        if submit_exercise_log:
-                            did_timer_finish = print_timer(exercise_rest_time)
-                            if did_timer_finish:
-                                st.write(did_timer_finish)
-                                #st.session_state["exset1"] = True
-                                st.experimental_rerun()
+                        coltime, colres = st.columns([2,2])
+                        with colres:
+                            with st.expander("Results"):
+                                weight_lifted = [the_reps*the_weight]
+                                if current_set == 1:
+                                    st.session_state["exset1reps"] = the_reps
+                                    df = pd.DataFrame({"set1":weight_lifted})
+                                elif current_set == 2:
+                                    st.session_state["exset2reps"] = the_reps
+                                    set1totweight = st.session_state["exset1reps"] * st.session_state["exset1"]
+                                    df = pd.DataFrame({"set1":set1totweight,"set2":weight_lifted})
+                                elif current_set == 3:
+                                    st.session_state["exset3reps"] = the_reps
+                                    set1totweight = st.session_state["exset1reps"] * st.session_state["exset1"]
+                                    set2totweight = st.session_state["exset2reps"] * st.session_state["exset2"]
+                                    df = pd.DataFrame({"set1":set1totweight,"set2":set2totweight,"set3":weight_lifted})
+                                st.dataframe(df.T)
+                        with coltime:
+                            with st.expander("Timer", True):
+                                if submit_exercise_log:
+                                    did_timer_finish = print_timer(exercise_rest_time)
+                                    if did_timer_finish:
+                                        st.write(did_timer_finish)
+                                        #st.session_state["exset1"] = True
+                                        st.experimental_rerun()
 
-    if (st.session_state["currentset"]) >= 4:
-        st.write("##")
-        # BUTTON FOR NEXT EXERCISE & SOME STATS N SHIT (& share but not rn) maybe nice to have next name too but text
-        # should legit just go, could pass args if needed but shouldnt really need to tbf?
-        # looks ugly af rn but meh can improve in future is just to show basic flow/logic/idea for personal project mvp
-        with st.container():
-            _,_,tendcol1,tendcol2 = st.columns(4)
-            tendcol1.write('#### NEXT UP >>')
-            tendcol1.write('exercise name')
-            tendcol2.button('GO TO EXERCISE 2')
 
-        with st.container():
-            endcol1,endcol2 = st.columns([2,1])
-            
-            st.write("You lifted blah")
-            set1totweight = st.session_state["exset1reps"] * st.session_state["exset1"]
-            set2totweight = st.session_state["exset2reps"] * st.session_state["exset2"]
-            set3totweight = st.session_state["exset3reps"] * st.session_state["exset3"]
-            final_ex1_totweight = set1totweight + set2totweight + set3totweight
+            if (st.session_state["currentset"]) >= 4:
+                st.write("##")
+                # BUTTON FOR NEXT EXERCISE & SOME STATS N SHIT (& share but not rn) maybe nice to have next name too but text
+                # should legit just go, could pass args if needed but shouldnt really need to tbf?
+                # looks ugly af rn but meh can improve in future is just to show basic flow/logic/idea for personal project mvp
+                with st.container():
+                    _,_,tendcol1,tendcol2 = st.columns(4)
+                    tendcol1.write('#### NEXT UP >>')
+                    tendcol1.write('exercise name')
+                    tendcol2.button('GO TO EXERCISE 2')
 
-            # NEED FIX DELTA, AND OBVS NEEDS CHECK FOR IF DATA EXISTS FIRST - LEGIT JUST USE DB QUERIES MORE
-            # - START TRACKING IN DETAIL EVERY SINGLE VAR YOU NEED!
+                with st.container():
+                    endcol1,endcol2 = st.columns([2,1])
+                    
+                    st.write("You lifted blah")
+                    set1totweight = st.session_state["exset1reps"] * st.session_state["exset1"]
+                    set2totweight = st.session_state["exset2reps"] * st.session_state["exset2"]
+                    set3totweight = st.session_state["exset3reps"] * st.session_state["exset3"]
+                    final_ex1_totweight = set1totweight + set2totweight + set3totweight
 
-            st.metric(label="Ex1 Weight Lifted", value=f"{final_ex1_totweight} KG", delta=f"{0} kg from last session")    
-            
-            compare_weight_tuple = get_weight_comparision(final_ex1_totweight)
-            st.write(compare_weight_tuple)
+                    # NEED FIX DELTA, AND OBVS NEEDS CHECK FOR IF DATA EXISTS FIRST - LEGIT JUST USE DB QUERIES MORE
+                    # - START TRACKING IN DETAIL EVERY SINGLE VAR YOU NEED!
 
-            st.write("##")
-            # obvs needs timestamp, want logic for if ur not consistent too as its important (e.g. 4 weeks off shouldnt validate a change!)
-            st.write("Weeks on Exercise = X, We Recommend You Do For X More (consistently)")
-            
-            endcol2.success("NEW PB - LEGOOOOO!")
+                    st.metric(label="Ex1 Weight Lifted", value=f"{final_ex1_totweight} KG", delta=f"{0} kg from last session")    
+                    
+                    compare_weight_tuple = get_weight_comparision(final_ex1_totweight)
+                    st.write(compare_weight_tuple)
+
+                    st.write("##")
+                    # obvs needs timestamp, want logic for if ur not consistent too as its important (e.g. 4 weeks off shouldnt validate a change!)
+                    st.write("Weeks on Exercise = X, We Recommend You Do For X More (consistently)")
+                    
+                    endcol2.success("NEW PB - LEGOOOOO!")
 
 
 
 
-def show_running_info():
-    """ for the current session """
-    # maybe have as a general function, not as a streamlit specific, and it just returns what is needed for the streamlit sections like metric or whatever
-    st.write("Make Me A Metric")
+        def show_running_info():
+            """ for the current session """
+            # maybe have as a general function, not as a streamlit specific, and it just returns what is needed for the streamlit sections like metric or whatever
+            st.write("Make Me A Metric")
 
 
 

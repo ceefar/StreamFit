@@ -6,3 +6,5 @@ SIC_ETL_REFERENCE/siic_etl_streamlitUSEME.py
 SIC_ETL_REFERENCE/siic_etl.py
 SIC_ETL_REFERENCE/siic_ceefar.py
 images/*
+BACKUPS/app_exercise1.py
+BACKUPS/*

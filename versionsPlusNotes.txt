@@ -22,9 +22,21 @@ Would Like This Sprint (i.e. today)
 -----------------------------------
 
 - set the equipment, pull from db more info on it
+    - ideally hiding rest of the display or making it not active to use anything else until is valid to do so (hide probably easier and better tho btw)
 
 - from there actually converting from just mg logging stats to equipmentexercise logging stats
     - (using link name for saving might actually be best since is unique?!)
 
 - preload "most popular" (dummified for now obvs) 
     - smart thing to do would be obvs just to do it for the 1st exercise so would need to know that before start the load
+    - do this in the main page with a button - or even a preliminary page (with some basic data and a progress bar, like tutorial tips ooo)
+    - that then loads in popular shit while u do the tutorial, or if youve done the tutorial but havent done the mg before loads the exercises
+
+
+
+To Do Soon
+-----------------------------------
+
+- actually equipment recommendations based on level etc
+- pre choosing your equipment / the prompt for it, so you are only recommended what you have
+- proper onboarding for level, time off, target muscle, etc
