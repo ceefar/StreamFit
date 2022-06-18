@@ -1,10 +1,42 @@
-# use this for commit messages too
 
 v0.3 - ONGOING
 
-Basic Equipment Implementation
-------------------------------
 
+Would Like This Sprint (i.e. today)
+-----------------------------------
+
+
+HERE RN!
+- from there actually converting from just mg logging stats to equipmentexercise logging stats
+    - using link name for saving might actually be best since is unique?!
+    - legit exactly how they are in images folder bosh
+
+
+
+- preload "most popular" (dummified for now obvs) 
+    - smart thing to do would be obvs just to do it for the 1st exercise so would need to know that before start the load
+    - do this in the main page with a button - or even a preliminary page (with some basic data and a progress bar, like tutorial tips ooo)
+    - that then loads in popular shit while u do the tutorial, or if youve done the tutorial but havent done the mg before loads the exercises
+
+- check if img exists in cache first before doing anything
+    - for returning users duh
+    - as in sure the word images might not be in session state but that doesnt mean there arent images
+        - so if there are images in there, initialise ["images"] and load them or figure it out whatever 
+        - just means adding their names to session state i swear?
+
+- set the equipment, pull from db more info on it
+    - again use a prog bar or spinner here (prog bar nice to learn?) 
+
+
+
+Completed 
+----------
+
+- ideally hiding rest of the display or making it not active to use anything else until is valid to do so (hide probably easier and better tho btw)
+- start with an expander of exercise info pulled dynamically from webpage!
+- with metrics of compound etc (which are in db tbf so load them first!)
+    
+    Basic Equipment Implementation (mostly completed anyways)
 - basic image screenshotter, using seleium for ss and removing popup with xpath, pil for image crop
     - only one site image tested so far
 - load screenshotted image to site for preview
@@ -15,26 +47,6 @@ Basic Equipment Implementation
 - dynamic name creation for image names based on links
 - pulling data from db based on various types of formatted names (kinda long tho should use a dict for displayName and DBusable name or sumnt similar ??)
 - clean loading and cache working basics for chest, both parent only and parent child cases semi tested, is <3
-
-
-
-Would Like This Sprint (i.e. today)
------------------------------------
-
-- set the equipment, pull from db more info on it
-    - start with an expander of exercise info pulled dynamically from webpage!
-    - with metrics of compound etc (which are in db tbf so load them first!)
-    - again use a prog bar or spinner here (prog bar nice to learn?) 
-    [DONE]
-    - [DONE] ideally hiding rest of the display or making it not active to use anything else until is valid to do so (hide probably easier and better tho btw)
-
-- from there actually converting from just mg logging stats to equipmentexercise logging stats
-    - (using link name for saving might actually be best since is unique?!)
-
-- preload "most popular" (dummified for now obvs) 
-    - smart thing to do would be obvs just to do it for the 1st exercise so would need to know that before start the load
-    - do this in the main page with a button - or even a preliminary page (with some basic data and a progress bar, like tutorial tips ooo)
-    - that then loads in popular shit while u do the tutorial, or if youve done the tutorial but havent done the mg before loads the exercises
 
 
 

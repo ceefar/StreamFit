@@ -1,7 +1,8 @@
-# main streamlit dashboard page
+# exercise one page
 # imports 
-# for web app and book format
+# for web app and test components
 import streamlit as st
+import streamlit.components.v1 as stc
 # for data manipulation
 import pandas as pd
 # for timing - changing this if you want to other better time but if fine for now
@@ -200,6 +201,22 @@ def use_name_get_link(musclegroup:str, parents_name:str, equip_name:str, kids_na
         return(exrx_link)
 
 
+def create_icon(font_size:int = "", font_color:str = ""):
+    """ testing -> returns the string needs with format var section to input the icon you want, format order is important based on parameters """
+
+    # call like this
+    # stc.html(create_icon().format("cloud"),height=50)
+
+    if font_size and font_color:
+        icon_create = """ <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"><i class="material-icons" style="font-size:{}rem; color:{};>{}</i> """
+    elif font_size:
+        icon_create = """ <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"><i class="material-icons" style="font-size:{}rem;>{}</i> """
+    elif font_color:
+        icon_create = """ <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"><i class="material-icons" style="color:{};>{}</i> """
+    else:
+        icon_create = """ <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"><i class="material-icons">{}</i> """
+    return(icon_create)
+
 
 # ---- START MAIN EXERCISE PAGE APP ----
 
@@ -304,7 +321,7 @@ def run():
     #split_current_equipex_name_for_link(current_equipex_name)
             
     
-    with st.expander(f"Quick Preview -> {current_equipex_name}", True):
+    with st.expander(f"Quick Preview", True):
         # FIXME :
         # obvs the above session state thing, also need new function for getting link from name (will have to format the link too)
         # clarify to user app faster once more images loaded, maybe through a success box or similar (alert if they have)
@@ -316,57 +333,94 @@ def run():
         # obvs could legit make a funct that goes through all links and saves them for me too / the user
         # to save time, do that and make it optional but dont use all images throughout as want to see any errors or potential sticking points
         img_path = get_ss(current_equipex_name, muscle_justname)
-        st.image(img_path)
+        _,midcol,_ = st.columns([1,3,1])
+        midcol.markdown(f"""<h3 style="text-align:center">{current_equipex_name}</h3>""", unsafe_allow_html=True) 
+        midcol.image(img_path)
 
     st.write("##")
 
-    has_chosen_equipmentexercise = st.button('CHOOSE THIS EXERCISE')
+    _,midcol2,_ = st.columns([2,3,1])
+    has_chosen_equipmentexercise = midcol2.button('CHOOSE THIS EXERCISE')
 
     st.write("##")
 
-    with st.expander("Exname Info"):
+
+    # OBVS DONT LOAD THIS UNTIL BUTTON PRESS BUT LEAVING RN FOR TESTING
+    with st.expander("Exercise Breakdown & Detailed Info"):
         exrx_exercise_link = split_current_equipex_name_for_link(current_equipex_name, muscle_justname)
         
         # obvs move to proper function place above page stuff
         exercise_info_list = exrx.grab_basic_exercise_info_from_exrx(exrx_exercise_link)
 
-        st.write("##")
+        #st.write("##")
 
         ex_utility, ex_mechanics, ex_force, ex_prep, ex_exec, ex_comments, ex_alsosee, ex_target, ex_synergists, ex_stabalisers = exercise_info_list
-        exinfocol1, exinfocol2, exinfocol3 = st.columns(3)
-        exinfocol1.write(f"UTILITY : **{ex_utility}**")
-        exinfocol2.write(f"MECHANICS : **{ex_mechanics}**") #FIXME: add icons here? test it to get working for elsewhere anyways https://autobencoder.com/2022-03-10-streamlit-fontawesome/
-        exinfocol3.write(f"FORCE : **{ex_force}**")
+        #exinfocol1, exinfocol2, exinfocol3 = st.columns(3)
+        #exinfocol1.write(f"UTILITY : **{ex_utility}**")
+        #exinfocol2.write(f"MECHANICS : **{ex_mechanics}**") 
+        #exinfocol3.write(f"FORCE : **{ex_force}**")
+        #st.write("##")
+
+        #NOTE: add icons here? well regardless of where atleast generally test it to get working for elsewhere anyways see https://github.com/BugzTheBunny/streamlit_custom_gui/blob/main/utils.py && https://autobencoder.com/2022-03-10-streamlit-fontawesome/
+        
+        style_exinfo_test = """ 
+        <div style="width:99%; height:100%; margin:0px; padding:0px; align-items:stretch; font-size:1.2rem; font-family:'Source Sans Pro', sans-serif; display:flex; flex-wrap:wrap; flex-grow:1">
+        <div style="width:32%; text-align:center; display:block; position:relative;"><span style="font-weight:300">{}</span><span style="font-weight:600">{}</span></div>
+        <div style="width:32%; text-align:center; display:block; position:relative;"><span style="font-weight:300">{}</span><span style="font-weight:600">{}</span></div>
+        <div style="width:32%; text-align:center; display:block; position:relative;"><span style="font-weight:300">{}</span><span style="font-weight:600">{}</span></div>
+        </div>
+        """
+        stc.html(style_exinfo_test.format("UTILITY : ", ex_utility, "MECHANICS : ", ex_mechanics, "FORCE : ", ex_force),height=60)
+            
+        st.write("**EXERCISE PREPARATION**")             
+        st.write(ex_prep)
+
         st.write("##")
+        st.write("**EXERCISE EXECUTION**")
+        st.write(ex_exec)
 
-        ## HAD CLEAN CCS HERE TO CENTRE TEXT BUT MEH - NEED TO FIGURE OUT SPECIFICS OR MSG ABOUT HOW TO HAVE MULTIPLE OR WHATEVER
+        st.write("---")
+        mginfocol1, mginfocol2, mginfocol3 = st.columns(3)
 
-        with st.container(): # .css-znku1x p and margin:0px prior to this
-            prep_style = f"""**EXERCISE PREPARATION**
-                    <style>
-                        .css-1valv9w
-                        {{
-                        gap: 0px;
-                        }}
-                    </style>
-                    """
-            st.markdown(prep_style, unsafe_allow_html=True)
+        mginfocol1.write("**TARGET MUSCLE**") # probably look better in a table or sumnt whatever is fine as is
+        mginfocol1.write(ex_target)
 
-            st.write(ex_prep)
+        if ex_synergists:
+            mginfocol2.write("**SYNERGISTS**")
+            for mg in ex_synergists:
+                mginfocol2.write(mg)
 
-            st.write("##")
-            st.write("**EXERCISE EXECUTION**")
-            st.write(ex_exec)
-            st.write("##")
-            infoimgcol1, infoimgcol2 = st.columns([1,2])
-            infoimgcol1.write("##")
-            infoimgcol1.write("**TARGET MUSCLE**") # probably look better in a table or sumnt whatever is fine as is
-            infoimgcol1.write(ex_target)
-            infoimgcol1.write("**STABALISERS**")
-            infoimgcol1.write(ex_stabalisers[0])
-            infoimgcol2.image(img_path)
+        if ex_stabalisers:
+            mginfocol3.write("**STABALISERS**")
+            mginfocol3.write(ex_stabalisers[0])
+
+        st.write("---")
+
+        if ex_alsosee or ex_comments:
+            imgcol1, imgcol2 = st.columns([1,2])
+            if ex_comments:
+                # manual margin - should make a funct, then can pass the px to it ooooo
+                imgcol1.markdown("""<div style="margin:10px 0px 0px"></div>""", unsafe_allow_html=True) 
+                imgcol1.write("**COMMENTS**")
+                imgcol1.write(ex_comments)
+            if ex_alsosee:
+                imgcol1.markdown("""<div style="margin:20px 0px 0px"></div>""", unsafe_allow_html=True) 
+                imgcol1.write("**ALSO SEE**")
+                imgcol1.write(ex_alsosee)
+                also_see_link = fitdb.get_also_see_info(ex_alsosee)
+                imgcol1.write(f"[More Info]({also_see_link})")
+            imgcol2.image(img_path)
+        else:
+            st.image(img_path)
+
+        st.write("---")
+
+        st.write("**ORIGIN**")
+        st.write(exrx_exercise_link)
+
         st.write("##")
-        st.write(exercise_info_list)
+        #st.write(exercise_info_list)
+    
 
 
     # CONTAINER FOR EVERYTHING BEFORE SELECTING EQUIPMENT!
@@ -388,8 +442,6 @@ def run():
                 st.write("Modifier : Nope")
                 get_image_for_muscle_group(muscle_justname)
                 st.write("##")
-
-
 
             # need some basic validation for if actually has stats (since may not, and much more likely once equipment), would still like some dummy/cute data or even explainer in its place
             # ---- PREVIOUS SETS COMPARISON EXPANDER [ALPHA] ----
@@ -630,12 +682,16 @@ def run():
                     endcol2.success("NEW PB - LEGOOOOO!")
 
 
-
-
-        def show_running_info():
-            """ for the current session """
-            # maybe have as a general function, not as a streamlit specific, and it just returns what is needed for the streamlit sections like metric or whatever
-            st.write("Make Me A Metric")
+    # css testing
+    st.markdown(unsafe_allow_html=True, body=f"""
+            <style>
+                .css-1valv9w
+                {{
+                gap: 6px;
+                margin: 0px, 0px, 0px
+                }}
+            </style>
+        """)
 
 
 

@@ -145,6 +145,23 @@ def check_if_usersession_table_exists(user_name:str = "") -> str:
 
 
 
+# ---- START GRAB BASIC DISPLAY INFO ----
+
+
+def get_also_see_info(also_see_name:str) -> str:
+    """ grabs the link from the also see table """
+    get_also_see_query = f"SELECT info_link FROM also_see WHERE info_name = '{also_see_name}'"
+    get_also_see = get_from_db(get_also_see_query)
+    get_also_see = get_also_see[0][0]
+    return(get_also_see)
+
+
+
+
+# ---- START GRAB BASIC DISPLAY INFO ----
+
+
+
 # ---- START EQUIPMENT EXERCISES DB SETUP ----
 
 
