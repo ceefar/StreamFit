@@ -7,10 +7,16 @@ Would Like This Sprint (i.e. today)
 
 
 HERE RN!
+- MAKE NEW PAGE FOR ONCE SELECTED SINCE RERUNS OTHERWISE UNLESS IS A WAY TO CUT IT OFF WITH A FUNCTION BUT DOUBT IT NEW PAGE EASY ENOUGH DW!
+
 - from there actually converting from just mg logging stats to equipmentexercise logging stats
     - using link name for saving might actually be best since is unique?!
     - legit exactly how they are in images folder bosh
 
+
+
+IMPORTANT!
+- before below should first implement a simple -> if img in images folder then add to cache function that either runs at start or runs when loading the image
 
 
 - preload "most popular" (dummified for now obvs) 

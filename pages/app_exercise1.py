@@ -29,9 +29,9 @@ def set_muscle_just_name(muscle:str) -> str:
 
 def get_image_for_muscle_group(mg):
     if mg == "Chest":
-        st.image("https://thehardgainerbible.com/wp-content/uploads/2022/03/Chest-Main-Only-Muscle-Img-NOBG_SMALL-SHADOW-CENTERED-1-300x142.png")
+        return("https://thehardgainerbible.com/wp-content/uploads/2022/03/Chest-Main-Only-Muscle-Img-NOBG_SMALL-SHADOW-CENTERED-1-300x142.png")
     if mg == "Back":
-        st.image("https://thehardgainerbible.com/wp-content/uploads/2022/03/Chest-Main-Targets-Synergists-LIGHTBG_SMALL-1-1-1-1-1-1-1-300x142.png")
+        return("https://thehardgainerbible.com/wp-content/uploads/2022/03/Chest-Main-Targets-Synergists-LIGHTBG_SMALL-1-1-1-1-1-1-1-300x142.png")
 
 
 def print_timer(max_time:int = 60):
@@ -218,6 +218,89 @@ def create_icon(font_size:int = "", font_color:str = ""):
     return(icon_create)
 
 
+# ---- v2 ----
+
+
+@st.cache
+def update_db_v2(args):
+    for i, arg in enumerate(args):
+        #print(f"{arg = }")
+        if i == 0:
+            name_of_active_user = arg
+        if i == 1:
+            user_id = arg
+        if i == 2:
+            name_of_session = arg
+        if i == 3:
+            name_of_mgnumb = arg
+        if i == 4:
+            the_current_set = arg
+            st.session_state["currentset"] += 1
+        if i == 5:
+            completed_reps = arg
+        if i == 6:
+            if st.session_state["currentset"] == 2:
+                st.session_state["exset1"] = arg
+            if st.session_state["currentset"] == 3:
+                st.session_state["exset2"] = arg
+            if st.session_state["currentset"] == 4:
+                st.session_state["exset3"] = arg
+            used_weight = arg
+        if i == 7:
+            the_total_weight = arg
+        if i == 8:
+            the_rest_time = arg
+        if i == 9:
+            equipex = arg
+
+    sessionID = st.session_state[f"{name_of_active_user}_sessionID"]
+    fitdb.add_exercise_set_data_to_db_v2(name_of_active_user, sessionID, name_of_session, name_of_mgnumb, equipex, the_current_set, completed_reps, used_weight, the_total_weight, the_rest_time)
+
+
+def split_current_equipex_shortname(equipex_name:str, muscle_justname:str) -> str:
+    """ self referencing, returns link, should find an easier way to do this tho """
+    # if is a child
+    if "->" in equipex_name:
+        kids_index = equipex_name.find("->")
+        equip_index = equipex_name.find("[")
+        kids_name = equipex_name[kids_index+3:equip_index-1]
+        parents_name = equipex_name[:kids_index]
+        equip_name = equipex_name[equip_index+1:-1]
+        parents_name = parents_name.strip()
+        shortname = use_name_get_shortname(muscle_justname, parents_name, equip_name, kids_name)
+        return(shortname)
+    else:
+        # if its a parent (no child)
+        equip_index = equipex_name.find("[")
+        equip_name = equipex_name[equip_index+1:-1]
+        parents_name = equipex_name[:equip_index]
+        parents_name = parents_name.strip()
+        # st.write(f"{parents_name = }")
+        # st.write(f"{equip_name = }")
+        shortname = use_name_get_shortname(muscle_justname, parents_name, equip_name)
+        return(shortname)
+
+
+def use_name_get_shortname(musclegroup:str, parents_name:str, equip_name:str, kids_name:str = ""):
+    if kids_name:
+        shortname = fitdb.get_exercise_shortname(musclegroup, parents_name, equip_name, kids_name)
+        return(shortname)
+    else:
+        shortname = fitdb.get_exercise_shortname(musclegroup, parents_name, equip_name)
+        return(shortname)
+
+
+@st.cache
+def grab_previous_set_data_v2(userName, sessionName, muscleNumb, equipExercise) -> tuple:
+    """ pls write me ceefar """
+    # obvs this will be equip so dw too much about weird way of doing this,
+    # for ex 2 just do same since we know which exercise number it is
+    needed_mg_name_format = f"1.{muscleNumb}" 
+    previous_set = fitdb.find_previous_sets_for_muscle_v2(userName, sessionName, needed_mg_name_format, equipExercise)
+    return(previous_set)
+
+
+
 # ---- START MAIN EXERCISE PAGE APP ----
 
 def run():
@@ -345,81 +428,12 @@ def run():
     st.write("##")
 
 
-    # OBVS DONT LOAD THIS UNTIL BUTTON PRESS BUT LEAVING RN FOR TESTING
-    with st.expander("Exercise Breakdown & Detailed Info"):
-        exrx_exercise_link = split_current_equipex_name_for_link(current_equipex_name, muscle_justname)
-        
-        # obvs move to proper function place above page stuff
-        exercise_info_list = exrx.grab_basic_exercise_info_from_exrx(exrx_exercise_link)
+    exrx_exercise_link = split_current_equipex_name_for_link(current_equipex_name, muscle_justname)
+    shortname = split_current_equipex_shortname(current_equipex_name, muscle_justname)
 
-        #st.write("##")
+    # obvs move to proper function place above page stuff
+    exercise_info_list = exrx.grab_basic_exercise_info_from_exrx(exrx_exercise_link)
 
-        ex_utility, ex_mechanics, ex_force, ex_prep, ex_exec, ex_comments, ex_alsosee, ex_target, ex_synergists, ex_stabalisers = exercise_info_list
-        #exinfocol1, exinfocol2, exinfocol3 = st.columns(3)
-        #exinfocol1.write(f"UTILITY : **{ex_utility}**")
-        #exinfocol2.write(f"MECHANICS : **{ex_mechanics}**") 
-        #exinfocol3.write(f"FORCE : **{ex_force}**")
-        #st.write("##")
-
-        #NOTE: add icons here? well regardless of where atleast generally test it to get working for elsewhere anyways see https://github.com/BugzTheBunny/streamlit_custom_gui/blob/main/utils.py && https://autobencoder.com/2022-03-10-streamlit-fontawesome/
-        
-        style_exinfo_test = """ 
-        <div style="width:99%; height:100%; margin:0px; padding:0px; align-items:stretch; font-size:1.2rem; font-family:'Source Sans Pro', sans-serif; display:flex; flex-wrap:wrap; flex-grow:1">
-        <div style="width:32%; text-align:center; display:block; position:relative;"><span style="font-weight:300">{}</span><span style="font-weight:600">{}</span></div>
-        <div style="width:32%; text-align:center; display:block; position:relative;"><span style="font-weight:300">{}</span><span style="font-weight:600">{}</span></div>
-        <div style="width:32%; text-align:center; display:block; position:relative;"><span style="font-weight:300">{}</span><span style="font-weight:600">{}</span></div>
-        </div>
-        """
-        stc.html(style_exinfo_test.format("UTILITY : ", ex_utility, "MECHANICS : ", ex_mechanics, "FORCE : ", ex_force),height=60)
-            
-        st.write("**EXERCISE PREPARATION**")             
-        st.write(ex_prep)
-
-        st.write("##")
-        st.write("**EXERCISE EXECUTION**")
-        st.write(ex_exec)
-
-        st.write("---")
-        mginfocol1, mginfocol2, mginfocol3 = st.columns(3)
-
-        mginfocol1.write("**TARGET MUSCLE**") # probably look better in a table or sumnt whatever is fine as is
-        mginfocol1.write(ex_target)
-
-        if ex_synergists:
-            mginfocol2.write("**SYNERGISTS**")
-            for mg in ex_synergists:
-                mginfocol2.write(mg)
-
-        if ex_stabalisers:
-            mginfocol3.write("**STABALISERS**")
-            mginfocol3.write(ex_stabalisers[0])
-
-        st.write("---")
-
-        if ex_alsosee or ex_comments:
-            imgcol1, imgcol2 = st.columns([1,2])
-            if ex_comments:
-                # manual margin - should make a funct, then can pass the px to it ooooo
-                imgcol1.markdown("""<div style="margin:10px 0px 0px"></div>""", unsafe_allow_html=True) 
-                imgcol1.write("**COMMENTS**")
-                imgcol1.write(ex_comments)
-            if ex_alsosee:
-                imgcol1.markdown("""<div style="margin:20px 0px 0px"></div>""", unsafe_allow_html=True) 
-                imgcol1.write("**ALSO SEE**")
-                imgcol1.write(ex_alsosee)
-                also_see_link = fitdb.get_also_see_info(ex_alsosee)
-                imgcol1.write(f"[More Info]({also_see_link})")
-            imgcol2.image(img_path)
-        else:
-            st.image(img_path)
-
-        st.write("---")
-
-        st.write("**ORIGIN**")
-        st.write(exrx_exercise_link)
-
-        st.write("##")
-        #st.write(exercise_info_list)
     
 
 
@@ -429,25 +443,123 @@ def run():
 
         if has_chosen_equipmentexercise:
 
+            st.write("##")
+
             #current equip ex name to find shit here, only need to use link DUHHHHH!
 
             if info[2]:
-                st.markdown(f"##### [ 1 ] - {muscle_justname} - ")
-                st.write(f"Modifier : {info[2]}")
-                get_image_for_muscle_group(muscle_justname)
+                mainimgcol1, mainimgcol2 = st.columns(2)
+                mainimgcol1.markdown(f"##### [ 1 ] - {shortname}")
+                mainimgcol2.write(f"##### [ 1 ] - {muscle_justname}")
+                mainimgcol1.write(f"Modifier : {info[2]}")
+                mgimg = get_image_for_muscle_group(muscle_justname)
+                mainimgcol2.write("##")
+                mainimgcol2.write("##")
+                mainimgcol2.image(mgimg)
+                mainimgcol1.image(img_path)
+                #
                 st.write("##")
 
             elif info[2] == None:
-                st.markdown(f"##### [ 1 ] - {muscle_justname}")
-                st.write("Modifier : Nope")
-                get_image_for_muscle_group(muscle_justname)
+                mainimgcol1, mainimgcol2 = st.columns(2)
+                mainimgcol1.markdown(f"##### [ 1 ] - {shortname}")
+                mainimgcol2.write(f"##### [ 1 ] - {muscle_justname}")
+                mainimgcol1.write("Modifier : Nope")
+                mgimg = get_image_for_muscle_group(muscle_justname)
+                mainimgcol2.write("##")
+                mainimgcol2.write("##")
+                mainimgcol2.image(mgimg)
+                mainimgcol1.image(img_path)
+                #
                 st.write("##")
+
+
+                    
+            # OBVS DONT LOAD THIS UNTIL BUTTON PRESS BUT LEAVING RN FOR TESTING
+            with st.expander("Exercise Breakdown & Detailed Info"):
+                exrx_exercise_link = split_current_equipex_name_for_link(current_equipex_name, muscle_justname)
+                shortname = split_current_equipex_shortname(current_equipex_name, muscle_justname)
+
+                # obvs move to proper function place above page stuff
+                exercise_info_list = exrx.grab_basic_exercise_info_from_exrx(exrx_exercise_link)
+
+                #st.write("##")
+
+                ex_utility, ex_mechanics, ex_force, ex_prep, ex_exec, ex_comments, ex_alsosee, ex_target, ex_synergists, ex_stabalisers = exercise_info_list
+                #exinfocol1, exinfocol2, exinfocol3 = st.columns(3)
+                #exinfocol1.write(f"UTILITY : **{ex_utility}**")
+                #exinfocol2.write(f"MECHANICS : **{ex_mechanics}**") 
+                #exinfocol3.write(f"FORCE : **{ex_force}**")
+                #st.write("##")
+
+                #NOTE: add icons here? well regardless of where atleast generally test it to get working for elsewhere anyways see https://github.com/BugzTheBunny/streamlit_custom_gui/blob/main/utils.py && https://autobencoder.com/2022-03-10-streamlit-fontawesome/
+                
+                style_exinfo_test = """ 
+                <div style="width:99%; height:100%; margin:0px; padding:0px; align-items:stretch; font-size:1.2rem; font-family:'Source Sans Pro', sans-serif; display:flex; flex-wrap:wrap; flex-grow:1">
+                <div style="width:32%; text-align:center; display:block; position:relative;"><span style="font-weight:300">{}</span><span style="font-weight:600">{}</span></div>
+                <div style="width:32%; text-align:center; display:block; position:relative;"><span style="font-weight:300">{}</span><span style="font-weight:600">{}</span></div>
+                <div style="width:32%; text-align:center; display:block; position:relative;"><span style="font-weight:300">{}</span><span style="font-weight:600">{}</span></div>
+                </div>
+                """
+                stc.html(style_exinfo_test.format("UTILITY : ", ex_utility, "MECHANICS : ", ex_mechanics, "FORCE : ", ex_force),height=60)
+                    
+                st.write("**EXERCISE PREPARATION**")             
+                st.write(ex_prep)
+
+                st.write("##")
+                st.write("**EXERCISE EXECUTION**")
+                st.write(ex_exec)
+
+                st.write("---")
+                mginfocol1, mginfocol2, mginfocol3 = st.columns(3)
+
+                mginfocol1.write("**TARGET MUSCLE**") # probably look better in a table or sumnt whatever is fine as is
+                mginfocol1.write(ex_target)
+
+                if ex_synergists:
+                    mginfocol2.write("**SYNERGISTS**")
+                    for mg in ex_synergists:
+                        mginfocol2.write(mg)
+
+                if ex_stabalisers:
+                    mginfocol3.write("**STABALISERS**")
+                    mginfocol3.write(ex_stabalisers[0])
+
+                st.write("---")
+
+                if ex_alsosee or ex_comments:
+                    imgcol1, imgcol2 = st.columns([1,2])
+                    if ex_comments:
+                        # manual margin - should make a funct, then can pass the px to it ooooo
+                        imgcol1.markdown("""<div style="margin:10px 0px 0px"></div>""", unsafe_allow_html=True) 
+                        imgcol1.write("**COMMENTS**")
+                        imgcol1.write(ex_comments)
+                    if ex_alsosee:
+                        imgcol1.markdown("""<div style="margin:20px 0px 0px"></div>""", unsafe_allow_html=True) 
+                        imgcol1.write("**ALSO SEE**")
+                        imgcol1.write(ex_alsosee)
+                        also_see_link = fitdb.get_also_see_info(ex_alsosee)
+                        imgcol1.write(f"[More Info]({also_see_link})")
+                    imgcol2.image(img_path)
+                else:
+                    st.image(img_path)
+
+                st.write("---")
+
+                st.write("**ORIGIN**")
+                st.write(exrx_exercise_link)
+
+                st.write("##")
+                #st.write(exercise_info_list)
+            
+
 
             # need some basic validation for if actually has stats (since may not, and much more likely once equipment), would still like some dummy/cute data or even explainer in its place
             # ---- PREVIOUS SETS COMPARISON EXPANDER [ALPHA] ----
-            with st.expander(f"Previous Stats For {muscle_justname}"):
-                    
-                previous_set = grab_previous_set_data(active_user, session_name, muscle_justname)
+            with st.expander(f"Previous Stats For {shortname}"):
+
+                previous_set = grab_previous_set_data_v2(active_user, session_name, muscle_justname, shortname)    
+                #previous_set = grab_previous_set_data(active_user, session_name, muscle_justname)
                 amount_of_sets = len(previous_set)
                 
                 if previous_set:
@@ -617,8 +729,9 @@ def run():
 
                     # ---- SUBMIT EXERCISE FORM LOGIC ----
                     if submit_exercise_log:
-
-                        update_db((active_user, "001", session_name, f"1.{muscle_justname}", current_set, the_reps, the_weight, the_reps*the_weight, exercise_rest_time))
+                        
+                        update_db_v2((active_user, "001", session_name, f"1.{muscle_justname}", shortname, current_set, the_reps, the_weight, the_reps*the_weight, exercise_rest_time))
+                        #update_db((active_user, "001", session_name, f"1.{muscle_justname}", current_set, the_reps, the_weight, the_reps*the_weight, exercise_rest_time))
 
                         coltime, colres = st.columns([2,2])
                         with colres:

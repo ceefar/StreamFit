@@ -385,6 +385,7 @@ def find_previous_sets_for_muscle(user_name:str, sessionName:str, muscleNumb:str
     # add timestamp, makes this easier - then id can truly be an id too
     # keeping this tho actually as just makes it easier, sure if always 3 sets np, but with increasing set counts would become problematic 
     prevSessionID = get_last_sessionid_from_current(user_name)
+    print(f"{prevSessionID = }")
     # print(f"{prevSessionID = }")
     # print(f"{sessionName = }")
     # print(f"{muscleNumb = }")
@@ -393,7 +394,76 @@ def find_previous_sets_for_muscle(user_name:str, sessionName:str, muscleNumb:str
     print(f"{previous_set = }")
     return(previous_set)
 
+# ---- v2 EquipExercise Updates ----
 
+def add_exercise_set_data_to_db_v2(user_name, sessionID, sessionName, muscleNumb, equipExercise, setNumb, setReps, setWeight, setTotalWeight, setRest):
+    """" v2 for v0.3 -> implementing equipment so now we aren't referencing the MuscleNumbGroup but the equipexercises which should be the same as the image name in images folder """
+    add_exercise_set_data_query = f"INSERT INTO {user_name}_sessions (userID, SessionID, SessionName, MuscleNumbGroup, EquipExercise, SetNumb, SetReps, SetWeight, SetTotalWeight, setRest) VALUES ('{user_name}', '{sessionID}', '{sessionName}', '{muscleNumb}', {equipExercise}, {setNumb}, {setReps}, {setWeight}, {setTotalWeight}, {setRest})"
+    add_to_db(add_exercise_set_data_query)
+    print(f"{user_name} - Set {setNumb} Written For {muscleNumb}")
+
+
+def find_previous_sets_for_muscle_v2(user_name:str, sessionName:str, muscleNumb:str, equipExercise:str) -> tuple:
+    """
+    find previous performed set by the user for the given muscle group 
+    obvs just poc as needs to be for equipment/exercise specific not muscle specific
+    logic wont change much once equipment is implemented since exercise names are/will be unique
+    """
+    # could grab prev session id from existing function using username - tbf could just pass it tho lol
+    # dont actually need this, can just grab the last ig anyway by ordering by this col and not returning/using the value for the col
+    # add timestamp, makes this easier - then id can truly be an id too
+    # keeping this tho actually as just makes it easier, sure if always 3 sets np, but with increasing set counts would become problematic 
+    prevSessionID = get_last_sessionid_from_current(user_name)
+    # print(f"{prevSessionID = }")
+    # print(f"{sessionName = }")
+    # print(f"{muscleNumb = }")
+    print(f"{prevSessionID = }")
+    get_previous_set_query = f"SELECT SetNumb, SetReps, SetWeight, SetTotalWeight FROM {user_name}_sessions WHERE sessionName = '{sessionName}' AND muscleNumbGroup = '{muscleNumb}' AND EquipExercise = '{equipExercise}' AND sessionid = '{prevSessionID}'"
+    previous_set = get_from_db(get_previous_set_query)
+    print(f"{previous_set = }")
+    return(previous_set)
+
+
+def get_exercise_shortname(musclename:str, parents_name:str, equip_name:str, kids_name:str = ""):
+    """ longwinded but easily improved, should consider cases for passing different things not just 3x names - use tuples is better then can check size of tuple if 2, 3, or 4 items """
+    
+    musclename = musclename.lower()
+    
+    if kids_name:
+        print(f"{musclename = }")
+        print(f"{parents_name = }")
+        print(f"{kids_name = }")
+        print(f"{equip_name = }")
+        # WILL NEED A BETTER WAY TO ACCESS OR ATLEAST NAME THE MG TABLES SINCE SENDING VARS AND MAY BE LIKE A SMALLER MG (mg child?) OR JUST HAVE 1 BIG TABLE FOR EACH MG IDK (best for now tbf)
+        pull_link_query = f"SELECT exLink FROM {musclename}_main WHERE exName = '{kids_name}' AND exParent = '{parents_name}' AND mainEquip = '{equip_name}'"
+        partial_exercise_link = get_from_db(pull_link_query)
+        partial_exercise_link = partial_exercise_link[0][0]
+        print(f"{partial_exercise_link = }")
+        # should really use regex to find first char thats not . or / but meh for now
+        trimmed_exercise_link = partial_exercise_link[5:]
+        print(f"{trimmed_exercise_link = }")
+        final_index = trimmed_exercise_link.rfind("/")
+        final_shortname = trimmed_exercise_link[final_index+1:]
+        print(f"{final_shortname = }")
+        return(final_shortname)
+    else:
+        print(f"{musclename = }")
+        print(f"{parents_name = }")
+        print(f"{equip_name = }")
+        # WILL NEED A BETTER WAY TO ACCESS OR ATLEAST NAME THE MG TABLES SINCE SENDING VARS AND MAY BE LIKE A SMALLER MG (mg child?) OR JUST HAVE 1 BIG TABLE FOR EACH MG IDK (best for now tbf)
+        pull_link_query = f"SELECT exLink FROM {musclename}_main WHERE exName = '{parents_name}' AND mainEquip = '{equip_name}'"
+        partial_exercise_link = get_from_db(pull_link_query)
+        partial_exercise_link = partial_exercise_link[0][0]
+        print(f"{partial_exercise_link[0][0] = }")
+        # should really use regex to find first char thats not . or / but meh for now
+        trimmed_exercise_link = partial_exercise_link[5:]
+        print(f"{trimmed_exercise_link = }")
+        final_index = trimmed_exercise_link.rfind("/")
+        final_shortname = trimmed_exercise_link[final_index+1:]
+        print(f"{final_shortname = }")
+        return(final_shortname)
+
+        
 
 # ---- MAIN ----
 
