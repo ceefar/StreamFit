@@ -5,22 +5,14 @@ v0.3 - ONGOING
 At Present
 -----------------------------------
 
-- from there actually converting from just mg logging stats to equipmentexercise logging stats
-    - using link name for saving might actually be best since is unique?!
-    - legit exactly how they are in images folder bosh
-    - kinda need timestamp, i mean dont but would be worth adding now tbf? (if not shortly)
 
-- img cache check thing - maybe as func for now at the point it would normally do the ss, since this does already exist to some capacity just figure out how it works ffs
 
-- test moving files in and out of that folder based on completion, i.e. if ex1select complete move in ex1 start, if ex1 start complete move in ex2 select...
+- then hop to other project/s for a bit
 
-- have weight and reps initial value set based on previous last set!
-    - this is where the incremenet decrement ceiling floor logic will go too ig 
 
 
 IMPORTANT!
 - before below should first implement a simple -> if img in images folder then add to cache function that either runs at start or runs when loading the image
-
 
 - preload "most popular" (dummified for now obvs) 
     - smart thing to do would be obvs just to do it for the 1st exercise so would need to know that before start the load
@@ -36,10 +28,23 @@ IMPORTANT!
 - set the equipment, pull from db more info on it
     - again use a prog bar or spinner here (prog bar nice to learn?) 
 
+- add timestamp to db schema 
+
+- will it work if not previously existing testing, maybe some unit tests couldnt hurt? *pleadingface*
 
 
 Completed 
 ----------
+
+- have weight and reps initial value set based on previous last set!
+    - this is where the incremenet decrement ceiling floor logic will go too ig 
+
+- img cache check thing - maybe as func for now at the point it would normally do the ss, since this does already exist to some capacity just figure out how it works ffs
+
+- from there actually converting from just mg logging stats to equipmentexercise logging stats
+    - using link name for saving might actually be best since is unique?!
+    - legit exactly how they are in images folder bosh
+    - kinda need timestamp, i mean dont but would be worth adding now tbf? (if not shortly) < not this tbf but the rest is done to semi-level, i.e. works for existing might not work if it doesnt find the exercise previously but will sort that later
 
 - 2 page style for select and start semi working, no reruns tho just configuring db for fully working
 
@@ -59,6 +64,9 @@ Completed
 - pulling data from db based on various types of formatted names (kinda long tho should use a dict for displayName and DBusable name or sumnt similar ??)
 - clean loading and cache working basics for chest, both parent only and parent child cases semi tested, is <3
 
+[COULDNT FIGURE OUT SO ABANDONDED FOR NOW]
+- test moving files in and out of that folder based on completion, i.e. if ex1select complete move in ex1 start, if ex1 start complete move in ex2 select...
+
 
 
 To Do Soon
@@ -67,6 +75,7 @@ To Do Soon
 - actually equipment recommendations based on level etc
 - pre choosing your equipment / the prompt for it, so you are only recommended what you have
 - proper onboarding for level, time off, target muscle, etc
+- for email stuff also see this -> https://www.youtube.com/watch?v=CgvOCXs8Xec&t=20s
 
 
 

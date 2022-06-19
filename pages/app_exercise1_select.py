@@ -7,8 +7,8 @@ import streamlit.components.v1 as stc
 import pandas as pd
 # for timing - changing this if you want to other better time but if fine for now
 from time import sleep
-# for images
-from PIL import Image
+# for file manipulation and folder navigation 
+import os
 # integrations for db access, workout calculations 
 import integration_database as fitdb
 import integration_workout as wocalc
@@ -154,8 +154,32 @@ def get_ss(equip_exercise_name:str, muscle_justname:str):
     ss_index = exrx_exercise_link.rfind("/")
     ssnamepath = f"images/{exrx_exercise_link[ss_index+1:]}.png" 
 
+
+
+
+    # NOTE - MAKE OWN FUNCTION PLS
+    # NEW - FOR CHECKING IF IN IMAGES FOLDER - MAKE OWN FUNCTION THO?!!?!!!
+
+    temp_pngname = f"{exrx_exercise_link[ss_index+1:]}.png"
+    print(f"{temp_pngname = }")
+
+    files_and_directories = os.listdir("images")
+    print(f"{files_and_directories = }")
+
+    if temp_pngname in files_and_directories:
+        print("JUST LOAD FROM DIRECTORY DUH!")
+        print(f"{ssnamepath = }")
+        return(ssnamepath)
+        # note to do that you just return the ssnamepath var like below bosh (nothing else needed as return will kill control flow there bosh bosh)
+
+    # also note sometimes may want to turn this off for testing, well until can do a generalised load or sumnt idk yet how would work in final version tbf
+
+    # END NEW ADDITION
+
+
+
     if equip_exercise_name in st.session_state["images"]:
-        print(f"{ssnamepath}")
+        print(f"{ssnamepath = }")
         return(ssnamepath)
     else:
         with st.spinner('Grabbing Exercise Data...'):
@@ -397,7 +421,6 @@ def run():
      'Choose Equipment',
      equip_tuple,
      ['Barbell'])
-
     
     just_exercises_list = []
     exercise_equipment = get_equipexercises_basic(equip_select)
@@ -452,8 +475,6 @@ def run():
     exercise_info_list = exrx.grab_basic_exercise_info_from_exrx(exrx_exercise_link)
 
     
-
-
     if has_chosen_equipmentexercise:
 
         st.session_state["ex1_img_path"] = img_path
@@ -461,15 +482,13 @@ def run():
         st.session_state["ex1_shortname"] = shortname
 
         st.write("##")
-        midcol2.subheader("Go To Exercise 1 Start")
-        midcol2.write("do file handling too!") # https://www.youtube.com/watch?v=NOvFZamGXXo&list=PLP0EnJyVQTh17zRrZIeKl1jKf1YbFzwiO&index=74
+        midcol2.subheader("Start Exercise 1")
+        
         # and remove the button?!! / else on screen?!?!!
 
+        # NEW - TESTING - FILE MANIPULATION
 
-
-
-
-            
+   
 
 
 

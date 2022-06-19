@@ -254,6 +254,7 @@ def update_db_v2(args):
         if i == 9:
             the_rest_time = arg
             
+
     sessionID = st.session_state[f"{name_of_active_user}_sessionID"]
     fitdb.add_exercise_set_data_to_db_v2(name_of_active_user, sessionID, name_of_session, name_of_mgnumb, equipex, the_current_set, completed_reps, used_weight, the_total_weight, the_rest_time)
 
@@ -367,12 +368,12 @@ def run():
     # need function for this (and others tbf) to be dynamic but for now just static
     exercise_rest_time = get_rest_time_from_muscle(muscle_justname, session_name)
 
+
     # IN THEORY I GUESS SHOULD ADD -> if Y != "" then X = Y but i mean its guna error if you go to it without selecting either way so.... 
     img_path = st.session_state["ex1_img_path"]
     current_equipex_name = st.session_state["ex1_current_equipex_name"]
     shortname = st.session_state["ex1_shortname"] 
-
-    # as per above 'IN THEORY', should just remove tho, as in as the below condition and then therefore here too but meh
+    
     if shortname != "":
         has_chosen_equipmentexercise = True
 
@@ -388,9 +389,6 @@ def run():
 
     st.title(f"Exericse 1 : {muscle_justname}")
     st.subheader(f":muscle: {session_name}")
-
-    st.write("##")
-
 
 
 
@@ -575,7 +573,7 @@ def run():
                             if want_prev_totweight:
                                 set1_current_session_tot_weight = st.session_state["exset1"] * st.session_state["exset1reps"]
                                 set1_tot_weight_delta = set1_current_session_tot_weight - set_1_total_weight
-                                st.metric(label="Prev Total Weight", value=f"{set_1_total_weight} kg", delta=f"{set1_tot_weight_delta} kg lifted today")
+                                st.metric(label="Previ Total Weight", value=f"{set_1_total_weight} reps", delta=f"{set1_tot_weight_delta} kg lifted today")
 
                     with psetcol2:
                         st.write("##### Set 2")
@@ -597,7 +595,7 @@ def run():
                             if want_prev_totweight:
                                 set2_current_session_tot_weight = st.session_state["exset2"] * st.session_state["exset2reps"]
                                 set2_tot_weight_delta = set2_current_session_tot_weight - set_2_total_weight
-                                st.metric(label="Prev Total Weight", value=f"{set_2_total_weight} kg", delta=f"{set2_tot_weight_delta} kg lifted today")
+                                st.metric(label="Previ Total Weight", value=f"{set_2_total_weight} reps", delta=f"{set2_tot_weight_delta} kg lifted today")
 
                     with psetcol3:
                         st.write("##### Set 3")
@@ -619,7 +617,7 @@ def run():
                             if want_prev_totweight:
                                 set3_current_session_tot_weight = st.session_state["exset3"] * st.session_state["exset3reps"]
                                 set3_tot_weight_delta = set3_current_session_tot_weight - set_3_total_weight
-                                st.metric(label="Prev Total Weight", value=f"{set_3_total_weight} kg", delta=f"{set3_tot_weight_delta} kg lifted today")    
+                                st.metric(label="Prev Total Weight", value=f"{set_3_total_weight} reps", delta=f"{set3_tot_weight_delta} kg lifted today")    
                 
                 else:
                     st.write("##### No Previous Set Info")
@@ -670,11 +668,29 @@ def run():
                     # SETS DICKHEAD - OR DOES IT GO FOR EVERY SET????
 
                     with logcol1:
-                        the_reps = st.number_input("Enter Reps Completed", step=1, key="the_reps")
+                        # FIXME: CURRENT WORKING ON THIS, MIGHT BREAK SHIT IDK
+                        # saying might break as i dont think they are declared if no previous set so would need a work around
+                        # tbf just catching the error with try except would work lol
+                        try:
+                            if set_1_reps:
+                                the_reps = st.number_input("Enter Reps Completed", value=set_1_reps, step=1, key="the_reps")
+                            else:
+                                the_reps = st.number_input("Enter Reps Completed", step=1, key="the_reps")
+                        except NameError:
+                            # set the value to sumnt tho?
+                            the_reps = st.number_input("Enter Reps Completed", step=1, key="the_reps")
+
 
                     with logcol2:
                         # obvs make a toggle for changing weight units - has considerations obvs 
-                        the_weight = st.number_input("Enter Weight Used In KG", 5.0, 500.0, step=0.5, key="the_weight")
+                        try:
+                            if set_1_weight:
+                                the_weight = st.number_input("Enter Weight Used In KG", 5.0, 500.0, value=set_1_weight, step=0.5, key="the_weight")
+                            else:
+                                the_weight = st.number_input("Enter Weight Used In KG", 5.0, 500.0, step=0.5, key="the_weight")
+                        except NameError:
+                            # set the value to sumnt tho?  
+                             the_weight = st.number_input("Enter Weight Used In KG", 5.0, 500.0, step=0.5, key="the_weight")                     
 
                     
                     with logcol3:
