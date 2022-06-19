@@ -2,17 +2,20 @@
 v0.3 - ONGOING
 
 
-Would Like This Sprint (i.e. today)
+At Present
 -----------------------------------
-
-
-HERE RN!
-- MAKE NEW PAGE FOR ONCE SELECTED SINCE RERUNS OTHERWISE UNLESS IS A WAY TO CUT IT OFF WITH A FUNCTION BUT DOUBT IT NEW PAGE EASY ENOUGH DW!
 
 - from there actually converting from just mg logging stats to equipmentexercise logging stats
     - using link name for saving might actually be best since is unique?!
     - legit exactly how they are in images folder bosh
+    - kinda need timestamp, i mean dont but would be worth adding now tbf? (if not shortly)
 
+- img cache check thing - maybe as func for now at the point it would normally do the ss, since this does already exist to some capacity just figure out how it works ffs
+
+- test moving files in and out of that folder based on completion, i.e. if ex1select complete move in ex1 start, if ex1 start complete move in ex2 select...
+
+- have weight and reps initial value set based on previous last set!
+    - this is where the incremenet decrement ceiling floor logic will go too ig 
 
 
 IMPORTANT!
@@ -38,6 +41,8 @@ IMPORTANT!
 Completed 
 ----------
 
+- 2 page style for select and start semi working, no reruns tho just configuring db for fully working
+
 - ideally hiding rest of the display or making it not active to use anything else until is valid to do so (hide probably easier and better tho btw)
 - start with an expander of exercise info pulled dynamically from webpage!
 - with metrics of compound etc (which are in db tbf so load them first!)
@@ -62,3 +67,12 @@ To Do Soon
 - actually equipment recommendations based on level etc
 - pre choosing your equipment / the prompt for it, so you are only recommended what you have
 - proper onboarding for level, time off, target muscle, etc
+
+
+
+New Schema Notes
+------------------------------------
+
+- name_sessions should be name_log/logger or name_session_log/logger
+- then name_sessions should be session ids with basic info like length of session, if completed, total weight, etc
+- then name (which should be name_info) should be general info like pw, level, total sessions completed, etc

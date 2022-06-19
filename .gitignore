@@ -8,3 +8,7 @@ SIC_ETL_REFERENCE/siic_ceefar.py
 images/*
 BACKUPS/app_exercise1.py
 BACKUPS/*
+NOTWORKING/app_exercise1_select_NOTWORKING.py
+NOTWORKING/*
+TOADD/zapp_basic_tutorial_IGNORE.py
+TOADD/*

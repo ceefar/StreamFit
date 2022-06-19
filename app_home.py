@@ -50,6 +50,13 @@ def run():
     )
     # sidebar stuff
     st.sidebar.info("Select a page above.")
+
+    # ---- [ NEW! ] session state assignment test  ----
+
+    if "session" not in st.session_state: # literally just adding this as is a strange error in ex pages (so moving adding this to main page, hadn't actually tested in ex page yet btw), yes if you get to this page without assigning the session it *should* error, but sometimes it errors when you *have* assigned the state beforehand so just testing with this to see what it does (as i expect it *should* break shit by writing over the existing current session with an empty string but then its confusing is it just the compiler or streamlit or wut?!)
+        st.session_state["session"] = ""
+
+    # ---- end new session state assignment ---- 
             
     # ---- calls and vars ----
     # EMPTY 

@@ -398,7 +398,7 @@ def find_previous_sets_for_muscle(user_name:str, sessionName:str, muscleNumb:str
 
 def add_exercise_set_data_to_db_v2(user_name, sessionID, sessionName, muscleNumb, equipExercise, setNumb, setReps, setWeight, setTotalWeight, setRest):
     """" v2 for v0.3 -> implementing equipment so now we aren't referencing the MuscleNumbGroup but the equipexercises which should be the same as the image name in images folder """
-    add_exercise_set_data_query = f"INSERT INTO {user_name}_sessions (userID, SessionID, SessionName, MuscleNumbGroup, EquipExercise, SetNumb, SetReps, SetWeight, SetTotalWeight, setRest) VALUES ('{user_name}', '{sessionID}', '{sessionName}', '{muscleNumb}', {equipExercise}, {setNumb}, {setReps}, {setWeight}, {setTotalWeight}, {setRest})"
+    add_exercise_set_data_query = f"INSERT INTO {user_name}_sessions (userID, SessionID, SessionName, MuscleNumbGroup, EquipExercise, SetNumb, SetReps, SetWeight, SetTotalWeight, setRest) VALUES ('{user_name}', '{sessionID}', '{sessionName}', '{muscleNumb}', '{equipExercise}', {setNumb}, {setReps}, {setWeight}, {setTotalWeight}, {setRest})"
     add_to_db(add_exercise_set_data_query)
     print(f"{user_name} - Set {setNumb} Written For {muscleNumb}")
 
